@@ -30,7 +30,7 @@ namespace CodeRoom.WebForms
                 ResolveUrl("~/Assets/css/site.css"),
                 version,
                 Environment.NewLine,
-                ResolveUrl("~/Assets/css/ui-updates.css"));
+                ResolveUrl("~/Assets/css/ui-updates.css") + "?v=" + version);
         }
 
         public void ValidateCsrf()
