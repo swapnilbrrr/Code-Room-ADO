@@ -207,6 +207,32 @@ namespace CodeRoom.WebForms.Helpers
             }
         }
 
+        public static void RefreshIdentity(User user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            var rememberMe = false;
+            var context = HttpContext.Current;
+            if (context != null)
+            {
+                var cookie = context.Request.Cookies[FormsAuthentication.FormsCookieName];
+                if (cookie != null && !string.IsNullOrWhiteSpace(cookie.Value))
+                {
+                    try
+                    {
+                        var ticket = FormsAuthentication.Decrypt(cookie.Value);
+                        rememberMe = ticket != null && ticket.IsPersistent;
+                    }
+                    catch
+                    {
+                        rememberMe = false;
+                    }
+                }
+            }
+
+            SignIn(user, rememberMe);
+        }
+
         public static void SignOut()
         {
             FormsAuthentication.SignOut();
