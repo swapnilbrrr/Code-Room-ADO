@@ -11,6 +11,13 @@ namespace CodeRoom.WebForms.Lessons
 {
     public partial class Index : Page
     {
+        protected global::System.Web.UI.WebControls.PlaceHolder LessonNotFound;
+        protected global::System.Web.UI.WebControls.PlaceHolder LessonContent;
+        protected global::System.Web.UI.WebControls.Repeater ContentParagraphsRepeater;
+        protected global::System.Web.UI.WebControls.HiddenField CompleteCsrfToken;
+        protected global::System.Web.UI.WebControls.Button CompleteButton;
+        protected global::System.Web.UI.WebControls.Repeater LessonsRepeater;
+
         private readonly CourseRepository courses = new CourseRepository();
         private readonly LessonRepository lessons = new LessonRepository();
         private readonly EnrollmentRepository enrollments = new EnrollmentRepository();
