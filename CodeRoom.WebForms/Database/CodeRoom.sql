@@ -386,9 +386,9 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Notifications_UserId_
     CREATE INDEX IX_Notifications_UserId_IsRead_CreatedAt ON dbo.Notifications (UserId, IsRead, CreatedAt);
 GO
 
-/* LearningActivityService.RecordAsync writes the notification type from the
-   caller, so the list above is wider than the six values documented in the
-   model. Repair a constraint left behind by an older run of this script. */
+/* LearningActivityService writes notification types from the learner workflow.
+   Keep the database constraint aligned with the source application's values.
+   Repair a constraint left behind by an older run of this script. */
 IF EXISTS (SELECT 1 FROM sys.check_constraints
            WHERE name = N'CK_Notifications_Type'
              AND parent_object_id = OBJECT_ID(N'dbo.Notifications')
