@@ -227,7 +227,7 @@ namespace CodeRoom.WebForms.Services
                     var certificates = new CertificateRepository();
                     if (!certificates.ExistsForUserAndCourse(userId, quiz.CourseId))
                     {
-                        var course = CourseRepository.GetByIdForTransaction(connection, transaction, quiz.CourseId);
+                        var course = new CourseRepository().GetById(quiz.CourseId);
                         var certificate = new Certificate
                         {
                             UserId = userId, CourseId = quiz.CourseId, QuizAttemptId = attempt.Id,
