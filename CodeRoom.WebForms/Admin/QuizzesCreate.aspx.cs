@@ -21,5 +21,6 @@ namespace CodeRoom.WebForms.Admin
         protected void ValidateTitle(object s,ServerValidateEventArgs a){var v=(a.Value??"").Trim();a.IsValid=v.Length>=3&&v.Length<=150;}
         protected void ValidateTime(object s,ServerValidateEventArgs a){int v;a.IsValid=int.TryParse(a.Value,out v)&&v>=0&&v<=180;}
         protected void ValidatePassing(object s,ServerValidateEventArgs a){int v;a.IsValid=int.TryParse(a.Value,out v)&&v>=0&&v<=100;}
+        protected void ValidateDescription(object s,ServerValidateEventArgs a){a.IsValid=(a.Value??"").Length<=500;}
     }
 }
