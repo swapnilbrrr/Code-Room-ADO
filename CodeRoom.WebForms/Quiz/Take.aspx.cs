@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Models;
 using CodeRoom.WebForms.Services;
@@ -30,7 +31,7 @@ namespace CodeRoom.WebForms.Quizzes
             QuizId.Value=quiz.Id.ToString(); PageTitle.Text=Server.HtmlEncode(quiz.Title)+" - Code-Room";
             AssessmentEyebrow.Text=quiz.IsCertificationExam ? "FINAL ASSESSMENT" : "KNOWLEDGE CHECK"; QuizTitle.Text=Server.HtmlEncode(quiz.Title);
             QuizDescription.Text=Server.HtmlEncode(quiz.Description); QuestionCount.Text=quiz.Questions.Count.ToString(); PassingScore.Text=GetRequiredScore(quiz).ToString();
-            TimeLimit.Text=quiz.TimeLimitMinutes+":00"; TimeInfo.Text=quiz.TimeLimitMinutes>0 ? "You have "+quiz.TimeLimitMinutes+" minutes." : "No time limit.";
+            TimeLimit.Text=quiz.TimeLimitMinutes+":00"; QuizTimer.Attributes["data-minutes"]=quiz.TimeLimitMinutes.ToString(); TimeInfo.Text=quiz.TimeLimitMinutes>0 ? "You have "+quiz.TimeLimitMinutes+" minutes." : "No time limit.";
             SubmitHint.Text=quiz.IsCertificationExam ? "Passing this exam may unlock a certificate." : "You can review your score after submission.";
             SubmitButton.Text=quiz.IsCertificationExam ? "Submit examination" : "Submit answers"; TimerPanel.Visible=quiz.TimeLimitMinutes>0;
             QuestionsRepeater.DataSource=quiz.Questions; QuestionsRepeater.DataBind();
@@ -49,6 +50,6 @@ namespace CodeRoom.WebForms.Quizzes
         }
         private static int GetRequiredScore(Quiz quiz){return string.Equals(quiz.AssessmentType,DomainValues.AssessmentType.Quiz,StringComparison.OrdinalIgnoreCase)?70:quiz.PassingScorePercent;}
         private void ShowNotFound(){QuizContent.Visible=false;NotFound.Visible=true;Response.StatusCode=404;Response.TrySkipIisCustomErrors=true;}
-        protected Panel QuizContent; protected Panel NotFound; protected Literal PageTitle; protected Literal AssessmentEyebrow; protected Literal QuizTitle; protected Literal QuizDescription; protected Literal QuestionCount; protected Literal PassingScore; protected Literal TimeLimit; protected Literal TimeInfo; protected Literal SubmitHint; protected Panel TimerPanel; protected HiddenField QuizId; protected Repeater QuestionsRepeater; protected Button SubmitButton;
+        protected HtmlGenericControl QuizTimer; protected Panel QuizContent; protected Panel NotFound; protected Literal PageTitle; protected Literal AssessmentEyebrow; protected Literal QuizTitle; protected Literal QuizDescription; protected Literal QuestionCount; protected Literal PassingScore; protected Literal TimeLimit; protected Literal TimeInfo; protected Literal SubmitHint; protected Panel TimerPanel; protected HiddenField QuizId; protected Repeater QuestionsRepeater; protected Button SubmitButton;
     }
 }
