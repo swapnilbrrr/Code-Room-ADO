@@ -46,6 +46,91 @@ namespace CodeRoom.WebForms.Services
             }
         }
 
+        public bool CompleteLesson(int userId, int lessonId, int courseId, string lessonTitle, string courseTitle)
+        {
+            var user = users.GetById(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("The learner account could not be found.");
+            }
+
+            using (var connection = DbConnectionFactory.Open())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                var courseExists = Exists(connection, transaction,
+                    "SELECT COUNT(1) FROM dbo.Courses WHERE Id = @CourseId;", courseId);
+                var lessonBelongs = Exists(connection, transaction,
+                    "SELECT COUNT(1) FROM dbo.Lessons WHERE Id = @LessonId AND CourseId = @CourseId;", lessonId, courseId);
+
+                if (!courseExists || !lessonBelongs)
+                {
+                    throw new InvalidOperationException("The requested lesson could not be found.");
+                }
+
+                if (!Exists(connection, transaction,
+                    "SELECT COUNT(1) FROM dbo.Enrollments WHERE UserId = @UserId AND CourseId = @CourseId;", userId, courseId))
+                {
+                    throw new InvalidOperationException("Enroll in this course before completing lessons.");
+                }
+
+                var firstCompletion = new ProgressRepository().MarkCompleted(connection, transaction, userId, lessonId);
+                if (!firstCompletion)
+                {
+                    transaction.Commit();
+                    return false;
+                }
+
+                var currentXp = RecordInsideTransaction(
+                    connection, transaction, user,
+                    DomainValues.ActivityType.LessonCompleted,
+                    "Completed " + lessonTitle,
+                    "Lesson completed",
+                    "Nice work. " + lessonTitle + " is now marked complete.",
+                    "/Lessons/Index.aspx?id=" + courseId + "&lessonId=" + lessonId,
+                    DomainValues.NotificationType.LessonCompletion,
+                    null);
+
+                AwardEligibleAchievements(connection, transaction, userId,
+                    DomainValues.ActivityType.LessonCompleted, currentXp);
+
+                var completeCount = CountCompletedLessons(connection, transaction, userId, courseId);
+                var totalCount = CountLessons(connection, transaction, courseId);
+                if (totalCount > 0 && completeCount == totalCount)
+                {
+                    const string title = "Course completed";
+                    var alreadyNotified = NotificationExists(connection, transaction, userId,
+                        DomainValues.NotificationType.CourseCompleted, title, "/Courses/Details.aspx?id=" + courseId);
+
+                    if (!alreadyNotified)
+                    {
+                        notifications.Insert(connection, transaction, new Notification
+                        {
+                            UserId = userId,
+                            Type = DomainValues.NotificationType.CourseCompleted,
+                            Title = title,
+                            Message = "You completed every lesson in " + courseTitle + ".",
+                            LinkUrl = "/Courses/Details.aspx?id=" + courseId,
+                            CreatedAt = DateTime.UtcNow,
+                            IsRead = false
+                        });
+
+                        ActivityRepository.Insert(connection, transaction, new UserActivity
+                        {
+                            UserId = userId,
+                            ActivityType = DomainValues.ActivityType.CourseCompleted,
+                            Description = "Completed " + courseTitle,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+
+                transaction.Commit();
+            }
+
+            TryRecordStreakMilestone(userId);
+            return true;
+        }
+
         public bool Enroll(int userId, int courseId, string courseTitle, string category, string lessonUrl)
         {
             var user = users.GetById(userId);
@@ -252,6 +337,63 @@ namespace CodeRoom.WebForms.Services
             }
 
             return streak;
+        }
+
+        private static bool Exists(SqlConnection connection, SqlTransaction transaction, string sql, int firstId, int? secondId = null)
+        {
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                if (sql.IndexOf("@LessonId", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    SqlHelper.AddInt(command, "@LessonId", firstId);
+                    SqlHelper.AddInt(command, "@CourseId", secondId.Value);
+                }
+                else
+                {
+                    SqlHelper.AddInt(command, "@UserId", firstId);
+                    SqlHelper.AddInt(command, "@CourseId", secondId.Value);
+                }
+
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
+        }
+
+        private static int CountCompletedLessons(SqlConnection connection, SqlTransaction transaction, int userId, int courseId)
+        {
+            const string sql =
+                "SELECT COUNT(1) FROM dbo.Progress AS p INNER JOIN dbo.Lessons AS l ON l.Id = p.LessonId " +
+                "WHERE p.UserId = @UserId AND l.CourseId = @CourseId AND p.IsCompleted = 1;";
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@UserId", userId);
+                SqlHelper.AddInt(command, "@CourseId", courseId);
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+        }
+
+        private static int CountLessons(SqlConnection connection, SqlTransaction transaction, int courseId)
+        {
+            const string sql = "SELECT COUNT(1) FROM dbo.Lessons WHERE CourseId = @CourseId;";
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@CourseId", courseId);
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+        }
+
+        private static bool NotificationExists(SqlConnection connection, SqlTransaction transaction, int userId, string type, string title, string linkUrl)
+        {
+            const string sql =
+                "SELECT COUNT(1) FROM dbo.Notifications WHERE UserId = @UserId AND [Type] = @Type " +
+                "AND Title = @Title AND LinkUrl = @LinkUrl;";
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@UserId", userId);
+                SqlHelper.AddNVarChar(command, "@Type", type, 40);
+                SqlHelper.AddNVarChar(command, "@Title", title, 160);
+                SqlHelper.AddNVarChar(command, "@LinkUrl", linkUrl, 300);
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
         }
 
         private static bool EnrollmentExists(SqlConnection connection, SqlTransaction transaction, int userId, int courseId)
