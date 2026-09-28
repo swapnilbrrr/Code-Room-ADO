@@ -22,6 +22,7 @@ namespace CodeRoom.WebForms
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Auth.EnsureSessionIdentity();
             bool authenticated = Auth.IsLoggedIn;
             bool admin = Auth.IsAdmin;
 
