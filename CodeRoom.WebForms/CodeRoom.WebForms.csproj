@@ -113,11 +113,11 @@
       <DependentUpon>Controls\NotificationBell.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Courses\Details.aspx.cs">
+    <Compile Include="Courses\Details.aspx.designer.cs">\n      <DependentUpon>Courses\Details.aspx</DependentUpon>\n      <SubType>ASPXCodeBehind</SubType>\n    </Compile>\n    <Compile Include="Courses\Details.aspx.cs">
       <DependentUpon>Courses\Details.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Courses\Index.aspx.cs">
+    <Compile Include="Courses\Index.aspx.designer.cs">\n      <DependentUpon>Courses\Index.aspx</DependentUpon>\n      <SubType>ASPXCodeBehind</SubType>\n    </Compile>\n    <Compile Include="Courses\Index.aspx.cs">
       <DependentUpon>Courses\Index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
