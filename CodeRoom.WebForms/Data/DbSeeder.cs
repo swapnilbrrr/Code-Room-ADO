@@ -541,7 +541,7 @@ namespace CodeRoom.WebForms.Data
                 "FROM dbo.Lessons AS l " +
                 "INNER JOIN dbo.Courses AS c ON c.Id = l.CourseId " +
                 "WHERE ISNULL(l.Content, N'') = N'' " +
-                "   OR LEN(ISNULL(l.Content, N'')) < 700 " +
+                "   OR LEN(ISNULL(l.Content, N'')) < 260 " +
                 "   OR (l.[Order] = 1 AND (l.VideoUrl IS NULL OR l.ResourceUrl IS NULL)) " +
                 "ORDER BY l.Id;";
 
