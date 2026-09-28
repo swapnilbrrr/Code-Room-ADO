@@ -54,7 +54,7 @@
                                 <asp:PlaceHolder ID="PhAdminConsole" runat="server" Visible="false">
                                     <a href='<%= ResolveUrl("~/Admin/Dashboard.aspx") %>'>▤&nbsp;&nbsp;Admin Console</a>
                                 </asp:PlaceHolder>
-                                <a class="account-danger" href='<%= ResolveUrl("~/Authentication/Logout.aspx") %>'>↪&nbsp;&nbsp;Logout</a>
+                                <asp:LinkButton ID="LogoutButton" runat="server" CssClass="account-danger" OnClick="LogoutButton_Click" CausesValidation="false">↪&nbsp;&nbsp;Logout</asp:LinkButton>
                             </div>
                         </div>
                     </asp:PlaceHolder>
@@ -132,7 +132,7 @@
                     <div>
                         <h2>Account</h2>
                         <asp:PlaceHolder ID="PhFooterAuth" runat="server" Visible="false">
-                            <a class="logout-form-link" href='<%= ResolveUrl("~/Authentication/Logout.aspx") %>'>Logout</a>
+                            <asp:LinkButton ID="FooterLogoutButton" runat="server" CssClass="logout-form-link" OnClick="LogoutButton_Click" CausesValidation="false">Logout</asp:LinkButton>
                         </asp:PlaceHolder>
                         <asp:PlaceHolder ID="PhFooterAnonymous" runat="server" Visible="false">
                             <a href='<%= ResolveUrl("~/Authentication/Login.aspx") %>'>Login</a>
