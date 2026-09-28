@@ -107,8 +107,6 @@ namespace CodeRoom.WebForms.Dashboard
                     : (int)Math.Round(row.CompletedLessons * 100.0 / row.TotalLessons);
             }
 
-            var enrolledIds = new HashSet<int>(enrolledCourses.Select(c => c.Id));
-            var totalLessons = enrolledCourses.Sum(c => c.Lessons == null ? 0 : c.Lessons.Count);
             var completedLessons = enrolledCourses.Sum(c => progress.CountCompletedInCourse(user.Id, c.Id));
 
             EnsureEnrollmentActivities(user.Id, enrolledCourses);
@@ -116,7 +114,6 @@ namespace CodeRoom.WebForms.Dashboard
             var activityFeed = activities.GetFeed(user.Id, 364, 5000);
             var streakActivities = activities.GetRecentForStreak(user.Id, 400);
             var recentAttempts = attempts.GetRecentForUser(user.Id, 5);
-            var attemptCount = attempts.CountByUser(user.Id);
             var quizAverage = attempts.GetAveragePercentForUser(user.Id);
 
             var primaryCategory = enrolledCourses
@@ -172,7 +169,7 @@ namespace CodeRoom.WebForms.Dashboard
             LessonsCount.Text = completedLessons.ToString();
             QuizAverage.Text = quizAverage.ToString();
             StreakCount.Text = learningStreak.ToString();
-            CertificateCount.Text = certificates.CountByUser(user.Id);
+            CertificateCount.Text = certificates.CountByUser(user.Id).ToString();
 
             CoursesEmpty.Visible = enrolledRows.Count == 0;
             CoursesRepeater.Visible = enrolledRows.Count > 0;
