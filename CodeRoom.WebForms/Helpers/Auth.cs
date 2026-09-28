@@ -1,16 +1,17 @@
 using System;
 using System.Web;
+using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.UI;
+using CodeRoom.WebForms.Data;
+using CodeRoom.WebForms.Models;
 using CodeRoom.WebForms.Services;
 
 namespace CodeRoom.WebForms.Helpers
 {
     /// <summary>
-    /// Session-backed identity for the migrated application. Keeps the source
-    /// application's custom authentication model rather than ASP.NET Identity.
-    /// Nothing populates the session until the login page is implemented in Phase 3,
-    /// so every page currently resolves to the anonymous state.
+    /// Authentication boundary for Code-Room. Forms Authentication owns the protected browser
+    /// ticket; Session holds the current user snapshot consumed by the Web Forms UI.
     /// </summary>
     public static class Auth
     {
@@ -19,7 +20,6 @@ namespace CodeRoom.WebForms.Helpers
         private const string KeyUsername = "CR_Username";
         private const string KeyEmail = "CR_Email";
         private const string KeyRole = "CR_Role";
-
         private const string LoginPage = "~/Authentication/Login.aspx";
         private const string DeniedPage = "~/Authentication/AccessDenied.aspx";
 
@@ -31,18 +31,14 @@ namespace CodeRoom.WebForms.Helpers
         private static object Read(string key)
         {
             var session = Session;
-            if (session == null)
-            {
-                return null;
-            }
-
-            return session[key];
+            return session == null ? null : session[key];
         }
 
         public static bool IsLoggedIn
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyUserId);
                 return value != null && Convert.ToInt32(value) > 0;
             }
@@ -52,6 +48,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyUserId);
                 return value == null ? 0 : Convert.ToInt32(value);
             }
@@ -61,6 +58,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyFullName);
                 return value == null ? string.Empty : value.ToString();
             }
@@ -70,6 +68,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyUsername);
                 return value == null ? string.Empty : value.ToString();
             }
@@ -79,6 +78,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyEmail);
                 return value == null ? string.Empty : value.ToString();
             }
@@ -88,6 +88,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
+                EnsureSessionIdentity();
                 object value = Read(KeyRole);
                 return value == null ? string.Empty : value.ToString();
             }
@@ -97,7 +98,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
-                string name = CurrentFullName;
+                var name = CurrentFullName;
                 return string.IsNullOrWhiteSpace(name) ? "Learner" : name.Split(' ')[0];
             }
         }
@@ -106,30 +107,19 @@ namespace CodeRoom.WebForms.Helpers
         {
             get
             {
-                string name = FirstName;
+                var name = FirstName;
                 return string.IsNullOrWhiteSpace(name) ? "C" : name.Substring(0, 1).ToUpperInvariant();
             }
         }
 
-        public static bool IsAdmin
-        {
-            get { return IsInRole(Roles.Admin) || IsInRole(Roles.SuperAdmin); }
-        }
-
-        public static bool IsSuperAdmin
-        {
-            get { return IsInRole(Roles.SuperAdmin); }
-        }
+        public static bool IsAdmin { get { return IsInRole(Roles.Admin) || IsInRole(Roles.SuperAdmin); } }
+        public static bool IsSuperAdmin { get { return IsInRole(Roles.SuperAdmin); } }
 
         public static string RoleLabel
         {
             get
             {
-                if (IsSuperAdmin)
-                {
-                    return "Super Administrator";
-                }
-
+                if (IsSuperAdmin) return "Super Administrator";
                 return IsInRole(Roles.Admin) ? "Administrator" : "Student";
             }
         }
@@ -139,77 +129,141 @@ namespace CodeRoom.WebForms.Helpers
             return string.Equals(CurrentRole, role, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static void SignIn(int userId, string fullName, string username, string email, string role)
+        public static void SignIn(User user, bool rememberMe)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            SignIn(user.Id, user.FullName, user.Username, user.Email, user.Role, rememberMe);
+        }
+
+        public static void SignIn(int userId, string fullName, string username, string email, string role, bool rememberMe)
         {
             var session = Session;
-            if (session == null)
-            {
-                return;
-            }
+            if (session == null) throw new InvalidOperationException("Session state is required for authentication.");
 
+            session.Clear();
             session[KeyUserId] = userId;
             session[KeyFullName] = fullName;
             session[KeyUsername] = username;
             session[KeyEmail] = email;
             session[KeyRole] = role;
+
+            var now = DateTime.Now;
+            var ticket = new FormsAuthenticationTicket(
+                1, username, now, now.Add(FormsAuthentication.Timeout), rememberMe,
+                userId.ToString(), FormsAuthentication.FormsCookiePath);
+
+            var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, FormsAuthentication.Encrypt(ticket))
+            {
+                HttpOnly = true,
+                Path = FormsAuthentication.FormsCookiePath
+            };
+
+            if (rememberMe) cookie.Expires = ticket.Expiration;
+            if (HttpContext.Current != null && HttpContext.Current.Request.IsSecureConnection) cookie.Secure = true;
+
+            HttpContext.Current.Response.Cookies.Set(cookie);
+        }
+
+        public static void EnsureSessionIdentity()
+        {
+            if (Session == null || Session[KeyUserId] != null) return;
+
+            var context = HttpContext.Current;
+            if (context == null) return;
+
+            var cookie = context.Request.Cookies[FormsAuthentication.FormsCookieName];
+            if (cookie == null || string.IsNullOrWhiteSpace(cookie.Value)) return;
+
+            try
+            {
+                var ticket = FormsAuthentication.Decrypt(cookie.Value);
+                if (ticket == null || ticket.Expired)
+                {
+                    FormsAuthentication.SignOut();
+                    return;
+                }
+
+                int userId;
+                if (!int.TryParse(ticket.UserData, out userId) || userId <= 0)
+                {
+                    FormsAuthentication.SignOut();
+                    return;
+                }
+
+                var user = new UserRepository().GetById(userId);
+                if (user == null)
+                {
+                    FormsAuthentication.SignOut();
+                    return;
+                }
+
+                Session[KeyUserId] = user.Id;
+                Session[KeyFullName] = user.FullName;
+                Session[KeyUsername] = user.Username;
+                Session[KeyEmail] = user.Email;
+                Session[KeyRole] = user.Role;
+            }
+            catch
+            {
+                FormsAuthentication.SignOut();
+                Session.Clear();
+            }
         }
 
         public static void SignOut()
         {
+            FormsAuthentication.SignOut();
             var session = Session;
-            if (session == null)
+            if (session != null)
             {
-                return;
+                session.Clear();
+                session.Abandon();
             }
-
-            session.Clear();
-            session.Abandon();
         }
 
-        /// <summary>Returns true when the request was redirected, so the caller must stop work.</summary>
         public static bool RequireLogin(Page page)
         {
-            if (IsLoggedIn)
-            {
-                return false;
-            }
+            if (page == null) throw new ArgumentNullException("page");
+            EnsureSessionIdentity();
 
-            page.Response.Redirect(page.ResolveUrl(LoginPage));
+            if (IsLoggedIn) return false;
+
+            var returnUrl = page.Request.RawUrl;
+            var loginUrl = page.ResolveUrl(LoginPage);
+
+            if (IsLocalUrl(returnUrl))
+                loginUrl += "?returnUrl=" + HttpUtility.UrlEncode(returnUrl);
+
+            page.Response.Redirect(loginUrl, false);
+            page.Context.ApplicationInstance.CompleteRequest();
             return true;
         }
 
-        /// <summary>Returns true when the request was redirected, so the caller must stop work.</summary>
         public static bool RequireAdmin(Page page)
         {
-            if (RequireLogin(page))
-            {
-                return true;
-            }
+            if (RequireLogin(page)) return true;
+            if (IsAdmin) return false;
 
-            if (IsAdmin)
-            {
-                return false;
-            }
-
-            page.Response.Redirect(page.ResolveUrl(DeniedPage));
+            page.Response.Redirect(page.ResolveUrl(DeniedPage), false);
+            page.Context.ApplicationInstance.CompleteRequest();
             return true;
         }
 
-        /// <summary>Returns true when the request was redirected, so the caller must stop work.</summary>
         public static bool RequireSuperAdmin(Page page)
         {
-            if (RequireLogin(page))
-            {
-                return true;
-            }
+            if (RequireLogin(page)) return true;
+            if (IsSuperAdmin) return false;
 
-            if (IsSuperAdmin)
-            {
-                return false;
-            }
-
-            page.Response.Redirect(page.ResolveUrl(DeniedPage));
+            page.Response.Redirect(page.ResolveUrl(DeniedPage), false);
+            page.Context.ApplicationInstance.CompleteRequest();
             return true;
+        }
+
+        private static bool IsLocalUrl(string url)
+        {
+            return !string.IsNullOrEmpty(url)
+                && url[0] == '/'
+                && (url.Length == 1 || (url[1] != '/' && url[1] != '\'));
         }
     }
 }
