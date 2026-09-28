@@ -1,0 +1,159 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="CodeRoom.WebForms.SiteMaster" %>
+<%@ Register TagPrefix="uc" TagName="NotificationBell" Src="~/Controls/NotificationBell.ascx" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Code-Room is a structured technology learning platform for students." />
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server">Code-Room</asp:ContentPlaceHolder></title>
+    <link rel="stylesheet" href='<%= ResolveUrl("~/Assets/css/site.css") %>?v=<%= AssetVersion %>' />
+    <link rel="stylesheet" href='<%= ResolveUrl("~/Assets/css/ui-updates.css") %>?v=<%= AssetVersion %>' />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <header class="site-header">
+            <nav class="navbar container" aria-label="Primary navigation">
+                <a class="brand" href='<%= ResolveUrl("~/Default.aspx") %>' aria-label="Code-Room home">
+                    <img class="logo-light" src='<%= ResolveUrl("~/Assets/images/code-room-logo.svg") %>' alt="Code-Room" />
+                    <img class="logo-dark" src='<%= ResolveUrl("~/Assets/images/code-room-logo-dark.svg") %>' alt="Code-Room" />
+                </a>
+
+                <div class="nav-links">
+                    <a href='<%= ResolveUrl("~/Default.aspx") %>'>Home</a>
+                    <a href='<%= ResolveUrl("~/Courses/Index.aspx") %>'>Courses</a>
+                    <asp:PlaceHolder ID="PhNavDashboard" runat="server" Visible="false">
+                        <a href='<%= ResolveUrl("~/Dashboard/MyDashboard.aspx") %>'>Dashboard</a>
+                    </asp:PlaceHolder>
+                    <a href='<%= ResolveUrl("~/About.aspx") %>'>About</a>
+                    <a href='<%= ResolveUrl("~/Faq.aspx") %>'>FAQ</a>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Switch to dark mode">☾</button>
+
+                    <asp:PlaceHolder ID="PhAuthenticated" runat="server" Visible="false">
+                        <uc:NotificationBell ID="Bell" runat="server" />
+
+                        <div class="account-menu">
+                            <button class="account-trigger" type="button" data-account-toggle aria-expanded="false" aria-controls="account-popover" aria-label="Open account menu" title="Account">
+                                <span class="profile-avatar"><%: Initial %></span>
+                            </button>
+                            <div id="account-popover" class="account-popover" data-account-menu hidden>
+                                <div class="account-popover-header">
+                                    <strong><%: DisplayName %></strong>
+                                    <span>@<%: Username %></span>
+                                    <span class="account-role"><%: RoleLabel %></span>
+                                </div>
+                                <a href='<%= ResolveUrl("~/Dashboard/MyDashboard.aspx") %>'>▦&nbsp;&nbsp;Dashboard</a>
+                                <a href='<%= ResolveUrl("~/Profile/Index.aspx") %>'>◎&nbsp;&nbsp;Profile</a>
+                                <a href='<%= ResolveUrl("~/Profile/Settings.aspx") %>'>⚙&nbsp;&nbsp;Settings</a>
+                                <asp:PlaceHolder ID="PhCertificates" runat="server" Visible="false">
+                                    <a href='<%= ResolveUrl("~/Certificates/Index.aspx") %>'>🎓&nbsp;&nbsp;Certificates</a>
+                                </asp:PlaceHolder>
+                                <asp:PlaceHolder ID="PhAdminConsole" runat="server" Visible="false">
+                                    <a href='<%= ResolveUrl("~/Admin/Dashboard.aspx") %>'>▤&nbsp;&nbsp;Admin Console</a>
+                                </asp:PlaceHolder>
+                                <a class="account-danger" href='<%= ResolveUrl("~/Authentication/Logout.aspx") %>'>↪&nbsp;&nbsp;Logout</a>
+                            </div>
+                        </div>
+                    </asp:PlaceHolder>
+
+                    <asp:PlaceHolder ID="PhAnonymous" runat="server" Visible="false">
+                        <a class="btn btn-ghost desktop-action" href='<%= ResolveUrl("~/Authentication/Login.aspx") %>'>Login</a>
+                        <a class="btn btn-primary desktop-action" href='<%= ResolveUrl("~/Authentication/Register.aspx") %>'>Get Started</a>
+                    </asp:PlaceHolder>
+
+                    <button class="mobile-toggle" type="button" data-mobile-toggle aria-expanded="false" aria-controls="mobile-navigation" aria-label="Open navigation">☰</button>
+                </div>
+            </nav>
+
+            <div id="mobile-navigation" class="mobile-navigation" data-mobile-menu>
+                <div class="container">
+                    <a href='<%= ResolveUrl("~/Default.aspx") %>'>Home</a>
+                    <a href='<%= ResolveUrl("~/Courses/Index.aspx") %>'>Courses</a>
+
+                    <asp:PlaceHolder ID="PhMobileAuth" runat="server" Visible="false">
+                        <a href='<%= ResolveUrl("~/Dashboard/MyDashboard.aspx") %>'>Dashboard</a>
+                        <a href='<%= ResolveUrl("~/Profile/Index.aspx") %>'>Profile</a>
+                        <a href='<%= ResolveUrl("~/Profile/Settings.aspx") %>'>Settings</a>
+                        <asp:PlaceHolder ID="PhMobileAdminConsole" runat="server" Visible="false">
+                            <a href='<%= ResolveUrl("~/Admin/Dashboard.aspx") %>'>Admin Console</a>
+                        </asp:PlaceHolder>
+                    </asp:PlaceHolder>
+
+                    <a href='<%= ResolveUrl("~/About.aspx") %>'>About</a>
+                    <a href='<%= ResolveUrl("~/Faq.aspx") %>'>FAQ</a>
+
+                    <asp:PlaceHolder ID="PhMobileAnonymous" runat="server" Visible="false">
+                        <a href='<%= ResolveUrl("~/Authentication/Login.aspx") %>'>Login</a>
+                        <a class="mobile-primary" href='<%= ResolveUrl("~/Authentication/Register.aspx") %>'>Get Started</a>
+                    </asp:PlaceHolder>
+                </div>
+            </div>
+        </header>
+
+        <asp:PlaceHolder ID="PhToast" runat="server" Visible="false">
+            <div class="toast" data-toast role="status" aria-live="polite">
+                <span class="toast-icon"><%: ToastIcon %></span>
+                <span class="toast-copy">
+                    <strong><%: ToastTitle %></strong>
+                    <span><%: ToastMessage %></span>
+                </span>
+                <button class="toast-close" type="button" data-toast-close aria-label="Dismiss notification">×</button>
+            </div>
+        </asp:PlaceHolder>
+
+        <main>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+        </main>
+
+        <footer class="site-footer">
+            <div class="container footer-inner">
+                <div class="footer-brand">
+                    <img class="logo-light" src='<%= ResolveUrl("~/Assets/images/code-room-logo.svg") %>' alt="Code-Room" />
+                    <img class="logo-dark" src='<%= ResolveUrl("~/Assets/images/code-room-logo-dark.svg") %>' alt="Code-Room" />
+                    <p>Learn. Code. Grow.</p>
+                </div>
+
+                <div class="footer-links">
+                    <div>
+                        <h2>Explore</h2>
+                        <a href='<%= ResolveUrl("~/Default.aspx") %>'>Home</a>
+                        <a href='<%= ResolveUrl("~/Courses/Index.aspx") %>'>Courses</a>
+                    </div>
+
+                    <div>
+                        <h2>Information</h2>
+                        <a href='<%= ResolveUrl("~/About.aspx") %>'>About</a>
+                        <a href='<%= ResolveUrl("~/Faq.aspx") %>'>FAQ</a>
+                    </div>
+
+                    <div>
+                        <h2>Account</h2>
+                        <asp:PlaceHolder ID="PhFooterAuth" runat="server" Visible="false">
+                            <a class="logout-form-link" href='<%= ResolveUrl("~/Authentication/Logout.aspx") %>'>Logout</a>
+                        </asp:PlaceHolder>
+                        <asp:PlaceHolder ID="PhFooterAnonymous" runat="server" Visible="false">
+                            <a href='<%= ResolveUrl("~/Authentication/Login.aspx") %>'>Login</a>
+                            <a href='<%= ResolveUrl("~/Authentication/Register.aspx") %>'>Register</a>
+                        </asp:PlaceHolder>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="container">
+                    <span>&copy; <%: CurrentYear %> Code-Room</span>
+                    <span>Web Applications Development Project</span>
+                    <span>All rights reserved.</span>
+                </div>
+            </div>
+        </footer>
+    </form>
+
+    <script src='<%= ResolveUrl("~/Assets/js/site.js") %>?v=<%= AssetVersion %>'></script>
+    <script src='<%= ResolveUrl("~/Assets/js/ui-updates.js") %>?v=<%= AssetVersion %>'></script>
+    <asp:ContentPlaceHolder ID="ScriptsContent" runat="server" />
+</body>
+</html>
