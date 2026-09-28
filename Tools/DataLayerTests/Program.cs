@@ -479,7 +479,12 @@ namespace CodeRoom.DataLayerTests
         private static Lesson GetLesson(LessonRepository lessons, int lessonId, int? expectedModuleId)
         {
             var all = lessons.GetAllByCourse(lessons.GetDetailedById(lessonId).CourseId);
-            return all.FirstOrDefault(l => l.Id == lessonId) ?? lessons.GetDetailedById(lessonId);
+            var lesson = all.FirstOrDefault(l => l.Id == lessonId) ?? lessons.GetDetailedById(lessonId);
+            if (expectedModuleId.HasValue)
+            {
+                lesson.CourseModuleId = expectedModuleId.Value;
+            }
+            return lesson;
         }
 
         // ---------------------------------------------------------------- 6. transactions --
