@@ -40,6 +40,11 @@ namespace CodeRoom.WebForms
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                Csrf.EnsureToken(MasterCsrfToken);
+            }
+
             Auth.EnsureSessionIdentity();
             bool authenticated = Auth.IsLoggedIn;
             bool admin = Auth.IsAdmin;
