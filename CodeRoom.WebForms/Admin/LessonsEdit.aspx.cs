@@ -41,7 +41,21 @@ namespace CodeRoom.WebForms.Admin
             Response.Redirect(ResolveUrl("~/Admin/Lessons.aspx?courseId="+courseId),false);Context.ApplicationInstance.CompleteRequest();
         }
         private Lesson BuildLesson(int id,int courseId){return new Lesson{Id=id,CourseId=courseId,Title=Title.Text.Trim(),Summary=string.IsNullOrWhiteSpace(SummaryText.Text)?null:SummaryText.Text.Trim(),Content=Content.Text,ContentType=ContentType.SelectedValue,VideoUrl=NullIfBlank(VideoUrl.Text),AudioUrl=NullIfBlank(AudioUrl.Text),ResourceUrl=NullIfBlank(ResourceUrl.Text),Order=int.Parse(Order.Text),DurationMinutes=int.Parse(DurationMinutes.Text),IsPublished=IsPublished.Checked};}
-        private CourseModule EnsureModule(System.Data.SqlClient.SqlConnection c,System.Data.SqlClient.SqlTransaction t,int courseId){var modules=new CourseModuleRepository().GetByCourse(courseId);if(modules.Count>0)return modules[0];var m=new CourseModule{CourseId=courseId,Title="Module 1 — Foundations",Description="Foundational concepts and guided practice.",Order=1};m.Id=new CourseModuleRepository().Insert(c,t,m);return m;}
+        private CourseModule EnsureModule(System.Data.SqlClient.SqlConnection c,System.Data.SqlClient.SqlTransaction t,int courseId)
+        {
+            const string sql = "SELECT TOP (1) m.Id, m.CourseId, m.Title, m.Description, m.ModuleOrder " +
+                "FROM dbo.CourseModules AS m LEFT JOIN dbo.Lessons AS l ON l.CourseModuleId = m.Id " +
+                "WHERE m.CourseId = @CourseId GROUP BY m.Id, m.CourseId, m.Title, m.Description, m.ModuleOrder " +
+                "ORDER BY COUNT(l.Id), m.ModuleOrder, m.Id;";
+            var module = SqlHelper.ReadFirst(c, t, sql, CourseModuleRepository.Map,
+                new System.Data.SqlClient.SqlParameter("@CourseId", System.Data.SqlDbType.Int) { Value = courseId });
+            if (module != null) return module;
+
+            var created = new CourseModule { CourseId = courseId, Title = "Module 1 — Foundations",
+                Description = "Foundational concepts and guided practice.", Order = 1 };
+            created.Id = new CourseModuleRepository().Insert(c, t, created);
+            return created;
+        }
         private static string NullIfBlank(string v){return string.IsNullOrWhiteSpace(v)?null:v.Trim();}
         protected void ValidateOrder(object s,ServerValidateEventArgs a){int v;a.IsValid=int.TryParse(a.Value,out v)&&v>=1&&v<=999;}
         protected void ValidateTitle(object s,ServerValidateEventArgs a){var v=(a.Value??"").Trim();a.IsValid=v.Length>=3&&v.Length<=150;}
