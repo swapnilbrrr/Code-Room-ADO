@@ -7,7 +7,7 @@ namespace CodeRoom.WebForms.Services
     /// PBKDF2 password hashing with a per-account random salt, using no external package.
     /// Stored format: {iterations}.{base64 salt}.{base64 hash}
     /// The parameters and format are identical to the source application, so hashes written by the
-    /// MySQL/EF Core build still verify here and vice versa.
+    /// source application's password hashes still verify here.
     /// </summary>
     public static class PasswordHasher
     {
