@@ -4,6 +4,7 @@ using System.Web.UI;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Helpers;
 using CodeRoom.WebForms.Models;
+using CodeRoom.WebForms.Services;
 
 namespace CodeRoom.WebForms.Courses
 {
