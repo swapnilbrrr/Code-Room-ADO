@@ -57,18 +57,16 @@ namespace CodeRoom.WebForms.Services
             using (var connection = DbConnectionFactory.Open())
             using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
             {
-                var courseExists = Exists(connection, transaction,
+                var courseExists = ExistsByCourse(connection, transaction,
                     "SELECT COUNT(1) FROM dbo.Courses WHERE Id = @CourseId;", courseId);
-                var lessonBelongs = Exists(connection, transaction,
-                    "SELECT COUNT(1) FROM dbo.Lessons WHERE Id = @LessonId AND CourseId = @CourseId;", lessonId, courseId);
+                var lessonBelongs = ExistsLessonInCourse(connection, transaction, lessonId, courseId);
 
                 if (!courseExists || !lessonBelongs)
                 {
                     throw new InvalidOperationException("The requested lesson could not be found.");
                 }
 
-                if (!Exists(connection, transaction,
-                    "SELECT COUNT(1) FROM dbo.Enrollments WHERE UserId = @UserId AND CourseId = @CourseId;", userId, courseId))
+                if (!EnrollmentExists(connection, transaction, userId, courseId))
                 {
                     throw new InvalidOperationException("Enroll in this course before completing lessons.");
                 }
@@ -339,21 +337,24 @@ namespace CodeRoom.WebForms.Services
             return streak;
         }
 
-        private static bool Exists(SqlConnection connection, SqlTransaction transaction, string sql, int firstId, int? secondId = null)
+        private static bool ExistsByCourse(SqlConnection connection, SqlTransaction transaction, string sql, int courseId)
         {
             using (var command = SqlHelper.Prepare(connection, transaction, sql))
             {
-                if (sql.IndexOf("@LessonId", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    SqlHelper.AddInt(command, "@LessonId", firstId);
-                    SqlHelper.AddInt(command, "@CourseId", secondId.Value);
-                }
-                else
-                {
-                    SqlHelper.AddInt(command, "@UserId", firstId);
-                    SqlHelper.AddInt(command, "@CourseId", secondId.Value);
-                }
+                SqlHelper.AddInt(command, "@CourseId", courseId);
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
+        }
 
+        private static bool ExistsLessonInCourse(SqlConnection connection, SqlTransaction transaction, int lessonId, int courseId)
+        {
+            const string sql =
+                "SELECT COUNT(1) FROM dbo.Lessons WHERE Id = @LessonId AND CourseId = @CourseId;";
+
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@LessonId", lessonId);
+                SqlHelper.AddInt(command, "@CourseId", courseId);
                 return Convert.ToInt32(command.ExecuteScalar()) > 0;
             }
         }
