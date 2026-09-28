@@ -181,7 +181,7 @@ namespace CodeRoom.WebForms.Services
                     Type = DomainValues.NotificationType.StreakMilestone,
                     Title = title,
                     Message = "You have learned on " + milestone + " consecutive days. Keep the momentum going!",
-                    LinkUrl = "~/Dashboard/MyDashboard.aspx",
+                    LinkUrl = "/Dashboard/MyDashboard.aspx",
                     CreatedAt = DateTime.UtcNow,
                     IsRead = false
                 });
@@ -330,7 +330,7 @@ namespace CodeRoom.WebForms.Services
                 Type = DomainValues.NotificationType.Achievement,
                 Title = "Achievement unlocked: " + achievement.Name,
                 Message = achievement.Description,
-                LinkUrl = "~/Profile/Index.aspx",
+                LinkUrl = "/Profile/Index.aspx",
                 CreatedAt = DateTime.UtcNow,
                 IsRead = false
             });
