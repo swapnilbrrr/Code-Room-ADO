@@ -19,7 +19,6 @@ namespace CodeRoom.WebForms.Profile
         protected DropDownList ProfileVisibility;
         protected CheckBox EmailNotificationsEnabled;
         protected RadioButton ThemeLight, ThemeDark, ThemeSystem;
-        protected HiddenField CsrfToken;
         protected Literal PreviewInitial, PreviewName, PreviewUsername;
         protected ValidationSummary ValidationSummary;
         protected Button SaveButton;
@@ -27,8 +26,6 @@ namespace CodeRoom.WebForms.Profile
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this)) return;
-            Csrf.EnsureToken(CsrfToken);
-
             if (!IsPostBack)
             {
                 var user = new UserRepository().GetById(Auth.CurrentUserId);
