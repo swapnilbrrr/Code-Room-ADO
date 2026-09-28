@@ -76,6 +76,7 @@ namespace CodeRoom.WebForms.Services
         {
             public const string Announcement = "Announcement";
             public const string CourseEnrollment = "CourseEnrollment";
+            public const string LessonCompletion = "LessonCompleted";
             public const string Activity = "Activity";
             public const string StreakMilestone = "StreakMilestone";
             public const string Achievement = "Achievement";
