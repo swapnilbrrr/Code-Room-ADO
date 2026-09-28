@@ -4,6 +4,7 @@ using System.Web.UI;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Helpers;
 using CodeRoom.WebForms.Models;
+using CodeRoom.WebForms.Services;
 
 namespace CodeRoom.WebForms.Challenges
 {
@@ -12,7 +13,7 @@ namespace CodeRoom.WebForms.Challenges
         protected System.Web.UI.WebControls.Panel NotFoundPanel;
         protected System.Web.UI.WebControls.Panel ChallengePanel;
         protected System.Web.UI.WebControls.Literal Category;
-        protected System.Web.UI.WebControls.Literal Title;
+        protected System.Web.UI.WebControls.Literal ChallengeTitle;
         protected System.Web.UI.WebControls.Literal Points;
         protected System.Web.UI.WebControls.Repeater InstructionRepeater;
         protected System.Web.UI.WebControls.Panel StarterPanel;
@@ -62,7 +63,7 @@ namespace CodeRoom.WebForms.Challenges
             }
 
             Category.Text = Server.HtmlEncode(course.Category ?? string.Empty).ToUpperInvariant();
-            Title.Text = Server.HtmlEncode(CurrentChallenge.Title);
+            ChallengeTitle.Text = Server.HtmlEncode(CurrentChallenge.Title);
             Points.Text = CurrentChallenge.Points.ToString();
             StarterCode.Text = Server.HtmlEncode(CurrentChallenge.StarterCode ?? string.Empty);
             Hint.Text = Server.HtmlEncode(CurrentChallenge.Hint ?? string.Empty);
