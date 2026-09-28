@@ -53,9 +53,8 @@ namespace CodeRoom.WebForms.Lessons
             }
 
             ContentParagraphsRepeater.DataSource = BuildParagraphs(CurrentLesson.Content);
-            ContentParagraphsRepeater.DataBind();
             LessonsRepeater.DataSource = Lessons;
-            LessonsRepeater.DataBind();
+            DataBind();
         }
 
         protected void CompleteButton_Click(object sender, EventArgs e)
