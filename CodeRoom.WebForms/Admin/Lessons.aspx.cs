@@ -44,22 +44,27 @@ namespace CodeRoom.WebForms.Admin
         {
             int courseId;
             var raw = CourseFilter.SelectedValue;
-            var list = !int.TryParse(raw, out courseId) || courseId <= 0
-                ? new LessonRepository().GetAllByCourse(0)
-                : new LessonRepository().GetAllByCourse(courseId);
+            var courseRepo = new CourseRepository();
+            var lessonRepo = new LessonRepository();
+            var rows = new System.Collections.Generic.List<object>();
+
             if (!int.TryParse(raw, out courseId) || courseId <= 0)
             {
-                var courses = new CourseRepository().GetAll();
-                list = courses.SelectMany(c => new LessonRepository().GetAllByCourse(c.Id).Select(l => { l.Course = c; return l; })).OrderBy(l => l.Course.Title).ThenBy(l => l.Order).ToList();
+                foreach (var course in courseRepo.GetAll())
+                    foreach (var lesson in lessonRepo.GetAllByCourse(course.Id))
+                        rows.Add(new { Id = lesson.Id, Order = lesson.Order, Title = lesson.Title, Course = course, IsPublished = lesson.IsPublished });
             }
             else
             {
-                var course = new CourseRepository().GetById(courseId);
-                foreach (var lesson in list) lesson.Course = course;
+                var course = courseRepo.GetById(courseId);
+                if (course != null)
+                    foreach (var lesson in lessonRepo.GetAllByCourse(courseId))
+                        rows.Add(new { Id = lesson.Id, Order = lesson.Order, Title = lesson.Title, Course = course, IsPublished = lesson.IsPublished });
             }
-            LessonsRepeater.DataSource = list;
+
+            LessonsRepeater.DataSource = rows;
             LessonsRepeater.DataBind();
-            EmptyPanel.Visible = list.Count == 0;
+            EmptyPanel.Visible = rows.Count == 0;
         }
 
         protected void DeleteButton_Command(object sender, CommandEventArgs e)
