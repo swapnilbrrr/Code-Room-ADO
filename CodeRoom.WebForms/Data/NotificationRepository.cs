@@ -22,6 +22,15 @@ namespace CodeRoom.WebForms.Data
                 new SqlParameter("@Take", SqlDbType.Int) { Value = take });
         }
 
+        public List<Notification> GetAllByUser(int userId)
+        {
+            const string sql =
+                "SELECT " + Columns + " FROM dbo.Notifications WHERE UserId = @UserId ORDER BY CreatedAt DESC;";
+
+            return SqlHelper.ReadList(sql, Map,
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId });
+        }
+
         public List<Notification> GetUnread(int userId, int take = 10)
         {
             const string sql =
