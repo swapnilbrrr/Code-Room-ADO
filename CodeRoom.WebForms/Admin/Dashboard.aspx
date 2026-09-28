@@ -1,17 +1,20 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="CodeRoom.WebForms.Admin.Dashboard" MasterPageFile="~/Site.Master" %>
-
-<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Admin console - Code-Room</asp:Content>
-
-<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>Admin console</h1>
-            <p class="page-intro">Course, lesson, quiz, user and content management will appear here.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
-</asp:Content>
+<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Admin Console - Code-Room</asp:Content>
+<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server"><section class="page-shell admin-dashboard"><div class="container">
+<div class="admin-header"><div class="admin-header-copy"><span class="eyebrow">ADMIN CONSOLE</span><h1 class="page-title">Platform management</h1><p class="page-intro">Manage users, learning content and platform operations from one dedicated workspace.</p></div><div class="admin-header-meta"><span class="admin-badge"><asp:Literal ID="RoleBadge" runat="server" /></span><a class="admin-badge admin-badge-link" href='<%= ResolveUrl("~/Profile/Index.aspx") %>'>View profile</a></div></div>
+<div class="admin-stat-grid"><article class="admin-stat"><span class="admin-stat-label">Users</span><strong><asp:Literal ID="UserCount" runat="server" /></strong><small><asp:Literal ID="StudentCount" runat="server" /> students with accounts</small></article><article class="admin-stat"><span class="admin-stat-label">Enrolments</span><strong><asp:Literal ID="EnrollmentCount" runat="server" /></strong><small>Learning paths started by users</small></article><article class="admin-stat"><span class="admin-stat-label">Assessments</span><strong><asp:Literal ID="AttemptCount" runat="server" /></strong><small><asp:Literal ID="QuizCount" runat="server" /> quizzes configured</small></article><article class="admin-stat"><span class="admin-stat-label">Certificates</span><strong><asp:Literal ID="CertificateCount" runat="server" /></strong><small><asp:Literal ID="ChallengeCount" runat="server" /> practice challenges</small></article></div>
+<div class="admin-section-title"><h2>Platform management</h2><span>Users, content, assessment and governance</span></div>
+<div class="admin-module-grid">
+<article class="admin-module admin-module-priority"><span class="admin-module-icon">01</span><h3>Users</h3><p>Review accounts, roles and platform access. Monitor the student base from one place.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Users.aspx") %>'>Manage users</a></article>
+<article class="admin-module"><span class="admin-module-icon">02</span><h3>Courses</h3><p>Create, update, organise and publish learning courses.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Courses.aspx") %>'>Manage courses</a></article>
+<article class="admin-module"><span class="admin-module-icon">03</span><h3>Lessons</h3><p>Organise lesson content, learning paths and resources.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Lessons.aspx") %>'>Manage lessons</a></article>
+<article class="admin-module"><span class="admin-module-icon">04</span><h3>Quizzes</h3><p>Create questions, assessments and review quiz activity.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Quizzes.aspx") %>'>Manage quizzes</a></article>
+<article class="admin-module"><span class="admin-module-icon">05</span><h3>Resources</h3><p>Maintain downloadable materials and supporting content.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Resources.aspx") %>'>Manage resources</a></article>
+<article class="admin-module"><span class="admin-module-icon">06</span><h3>Announcements</h3><p>Publish updates and important learning platform notices.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Announcements.aspx") %>'>Manage announcements</a></article>
+<article class="admin-module"><span class="admin-module-icon">07</span><h3>Practice Challenges</h3><p>Build hands-on coding and command-line tasks, set validation rules and award XP.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Challenges.aspx") %>'>Manage challenges</a></article>
+<article class="admin-module"><span class="admin-module-icon">08</span><h3>Audit Log</h3><p><asp:Literal ID="AuditCount" runat="server" /> administrative actions are recorded for traceability.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/Audit.aspx") %>'>View audit trail</a></article>
+<asp:Panel ID="SuperAdminModule" runat="server" CssClass="admin-module admin-super-module" Visible="false"><span class="admin-module-icon">09</span><h3>SuperAdmin workspace</h3><p><asp:Literal ID="AdminCount" runat="server" /> administrative accounts currently have platform access.</p><a class="btn btn-secondary" href='<%= ResolveUrl("~/Admin/System.aspx") %>'>Open governance</a></asp:Panel>
+</div>
+<div class="admin-lower-grid"><section class="admin-recent-panel"><div class="admin-section-title"><h2>Recent registrations</h2><span>Newest accounts</span></div><div class="admin-recent-list"><asp:Repeater ID="RecentUsersRepeater" runat="server"><ItemTemplate><div class="admin-recent-row"><span class="profile-avatar"><%# Eval("Initial") %></span><div><strong><%# Eval("FullName") %></strong><small>@<%# Eval("Username") %> · <%# Eval("Role") %></small></div><time><%# Eval("Date") %></time></div></ItemTemplate></asp:Repeater></div></section>
+<section class="admin-recent-panel"><div class="admin-section-title"><h2>Recent admin activity</h2><span>Last six actions</span></div><div class="admin-recent-list"><asp:Repeater ID="AuditRepeater" runat="server"><ItemTemplate><div class="admin-recent-row"><span class="audit-person"><%# Eval("Initial") %></span><div><strong><%# Eval("Action") %> · <%# Eval("EntityType") %></strong><small><%# Eval("Description") %></small></div><time><%# Eval("Time") %></time></div></ItemTemplate></asp:Repeater></div></section></div>
+</div></section></asp:Content>
