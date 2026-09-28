@@ -132,4 +132,4 @@ This console harness exercises the ADO.NET layer against SQL Server, including s
 
 ## Migration status
 
-The repository is being migrated incrementally from the original MVC implementation. The original project is temporarily retained as the functionality reference while the Web Forms implementation reaches feature parity. It is not part of the target technology stack and will be removed from the final submission after parity and regression testing are complete.
+The repository contains the completed Web Forms/ADO.NET migration target. The original MVC implementation is maintained separately in the reference repository and is not part of this target solution.
