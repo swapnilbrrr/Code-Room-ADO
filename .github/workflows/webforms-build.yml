@@ -37,3 +37,10 @@ jobs:
           & .\\Tools\\DataLayerTests\\bin\\Debug\\DataLayerTests.exe *> test-output.txt
           Get-Content test-output.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload acceptance output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-layer-test-output
+          path: test-output.txt
