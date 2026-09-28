@@ -5,7 +5,7 @@
  <asp:Panel ID="NotFoundPanel" runat="server" Visible="false" CssClass="empty-state"><div class="empty-state-icon">🧩</div><h2>Challenge unavailable.</h2><p>The requested practice challenge could not be found.</p></asp:Panel>
  <asp:Panel ID="ChallengePanel" runat="server" Visible="false">
   <article class="content-panel challenge-panel">
-   <div class="challenge-header"><div><span class="eyebrow">PRACTICE CHALLENGE · <asp:Literal ID="Category" runat="server" /></span><h1><asp:Literal ID="Title" runat="server" /></h1></div><span class="xp-chip">+<asp:Literal ID="Points" runat="server" /> XP</span></div>
+   <div class="challenge-header"><div><span class="eyebrow">PRACTICE CHALLENGE · <asp:Literal ID="Category" runat="server" /></span><h1><asp:Literal ID="ChallengeTitle" runat="server" /></h1></div><span class="xp-chip">+<asp:Literal ID="Points" runat="server" /> XP</span></div>
    <div class="challenge-instructions"><asp:Repeater ID="InstructionRepeater" runat="server"><ItemTemplate><p><%# Container.DataItem %></p></ItemTemplate></asp:Repeater></div>
    <asp:Panel ID="StarterPanel" runat="server" Visible="false"><div class="code-block"><div class="code-block-label">STARTER</div><pre><code><asp:Literal ID="StarterCode" runat="server" /></code></pre></div></asp:Panel>
    <asp:Panel ID="HintPanel" runat="server" Visible="false"><details class="hint-box"><summary>Need a hint?</summary><p><asp:Literal ID="Hint" runat="server" /></p></details></asp:Panel>
