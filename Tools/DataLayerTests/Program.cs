@@ -39,6 +39,8 @@ namespace CodeRoom.DataLayerTests
             Section("5. Unique constraints, foreign keys and cascade behaviour", ConstraintsAndForeignKeys);
             Section("6. Transactions", Transactions);
             Section("7. Atomic XP updates", AtomicXp);
+            Section("8. Domain and security invariants", DomainAndSecurityInvariants);
+            Section("9. End-to-end certification quiz flow", CertificationQuizFlow);
 
             Console.WriteLine();
             Console.WriteLine("Passed: " + _passed + ", Failed: " + _failed);
@@ -619,6 +621,143 @@ namespace CodeRoom.DataLayerTests
             Check("XP returned to its starting value", users.GetById(userId).Xp == start);
 
             Console.WriteLine("       (The increment is written as 'Xp = Xp + @Amount' in SQL, not read and rewritten in C#.)");
+        }
+
+        // ------------------------------------------------ 8. domain/security invariants --
+
+        private static void DomainAndSecurityInvariants()
+        {
+            Heading("8. Domain and security invariants");
+
+            var hash = PasswordHasher.Hash("TestPass!123");
+            Check("PBKDF2 hash verifies the original password", PasswordHasher.Verify("TestPass!123", hash));
+            Check("PBKDF2 hash rejects a different password", !PasswordHasher.Verify("WrongPass!123", hash));
+            Check("PBKDF2 hash uses the documented three-part format", hash.Split('.').Length == 3);
+            Check("PasswordHasher rejects malformed stored hashes", !PasswordHasher.Verify("TestPass!123", "not-a-valid-hash"));
+
+            var quizRepo = new QuizRepository();
+            var demoQuiz = quizRepo.GetByCourse(new CourseRepository().GetBySlug("python-programming").Id);
+            Check("Quiz pass rule uses 70% for ordinary quizzes", demoQuiz != null && quizRepo.HasPassed(demoQuiz, 70));
+            Check("Ordinary quiz pass rule rejects 69%", demoQuiz != null && !quizRepo.HasPassed(demoQuiz, 69));
+
+            Check("Level starts at 1", LearningActivityService.GetLevel(0) == 1);
+            Check("Level advances every 250 XP", LearningActivityService.GetLevel(250) == 2 && LearningActivityService.GetLevel(500) == 3);
+            Check("Level progress is XP modulo 250", LearningActivityService.GetLevelProgress(525) == 25);
+
+            var today = DateTime.UtcNow.Date;
+            var streak = new[]
+            {
+                new UserActivity { ActivityType = DomainValues.ActivityType.LessonCompleted, CreatedAt = today },
+                new UserActivity { ActivityType = DomainValues.ActivityType.QuizAttempted, CreatedAt = today.AddDays(-1) },
+                new UserActivity { ActivityType = DomainValues.ActivityType.ChallengeCompleted, CreatedAt = today.AddDays(-2) },
+                new UserActivity { ActivityType = "ProfileUpdated", CreatedAt = today.AddDays(-3) }
+            };
+            Check("Streak calculation counts consecutive learning days", LearningActivityService.CalculateStreak(streak, today) == 3);
+
+            var challenge = new Challenge
+            {
+                ExpectedAnswer = "  hello world  ",
+                ValidationMode = DomainValues.ValidationMode.Exact
+            };
+            Check("Challenge exact validation ignores formatting whitespace", ChallengeRepository.Validate(challenge, "hello world"));
+            Check("Challenge exact validation rejects the wrong answer", !ChallengeRepository.Validate(challenge, "goodbye"));
+
+            challenge.ValidationMode = DomainValues.ValidationMode.Contains;
+            Check("Challenge contains validation accepts a matching substring", ChallengeRepository.Validate(challenge, "say hello world now"));
+        }
+
+        // ----------------------------------------------- 9. end-to-end quiz flow --
+
+        private static void CertificationQuizFlow()
+        {
+            Heading("9. End-to-end certification quiz flow");
+
+            const string quizSql =
+                "SELECT TOP (1) q.Id, q.CourseId " +
+                "FROM dbo.Quizzes AS q " +
+                "INNER JOIN dbo.Courses AS c ON c.Id = q.CourseId " +
+                "WHERE q.IsCertificationExam = 1 AND c.IsPublished = 1 " +
+                "  AND EXISTS (SELECT 1 FROM dbo.Questions AS qs WHERE qs.QuizId = q.Id) " +
+                "ORDER BY q.Id;";
+
+            int quizId = 0;
+            int courseId = 0;
+            using (var connection = DbConnectionFactory.Open())
+            using (var command = SqlHelper.Prepare(connection, null, quizSql))
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    quizId = reader.GetInt32(0);
+                    courseId = reader.GetInt32(1);
+                }
+            }
+
+            Check("A seeded certification exam with questions exists", quizId > 0 && courseId > 0);
+            if (quizId <= 0 || courseId <= 0)
+            {
+                return;
+            }
+
+            var username = "test.learner." + Guid.NewGuid().ToString("N").Substring(0, 10);
+            var user = new User
+            {
+                FullName = "Certification Test Learner",
+                Username = username,
+                Email = username + "@coderoom.test",
+                PasswordHash = PasswordHasher.Hash("TestPass!123"),
+                Role = Roles.Student,
+                Xp = 0,
+                ThemePreference = DomainValues.Theme.System,
+                ProfileVisibility = DomainValues.Visibility.Public,
+                EmailNotificationsEnabled = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var users = new UserRepository();
+            var userId = users.Insert(user);
+            try
+            {
+                var course = new CourseRepository().GetById(courseId);
+                var quiz = new QuizRepository().GetForTaking(quizId);
+                Check("Certification test user was created", users.GetById(userId) != null);
+
+                var enrolled = new LearningActivityService().Enroll(
+                    userId, courseId, course.Title, course.Category, "/Courses/Details.aspx?id=" + courseId);
+                Check("Certification test user can enroll", enrolled);
+                Check("Enrollment is persisted", new EnrollmentRepository().IsEnrolled(userId, courseId));
+
+                var wrongAnswers = quiz.Questions.ToDictionary(q => q.Id, q => "Z");
+                var failedAttempt = new LearningActivityService().SubmitQuiz(userId, quiz, wrongAnswers);
+                Check("Failed certification attempt is stored", failedAttempt != null && failedAttempt.Score == 0);
+                Check("Failed certification attempt does not create a certificate",
+                    !new CertificateRepository().ExistsForUserAndCourse(userId, courseId));
+
+                var correctAnswers = quiz.Questions.ToDictionary(q => q.Id, q => q.CorrectOption);
+                var passedAttempt = new LearningActivityService().SubmitQuiz(userId, quiz, correctAnswers);
+                Check("Passing certification attempt is stored", passedAttempt != null && passedAttempt.Score == quiz.Questions.Count);
+                Check("Passing certification attempt creates a certificate",
+                    new CertificateRepository().ExistsForUserAndCourse(userId, courseId));
+
+                var beforeSecondPass = CountUserCertificates(userId, courseId);
+                new LearningActivityService().SubmitQuiz(userId, quiz, correctAnswers);
+                var afterSecondPass = CountUserCertificates(userId, courseId);
+                Check("Repeated passing exam does not create a second certificate", beforeSecondPass == afterSecondPass);
+            }
+            finally
+            {
+                users.Delete(userId);
+                Check("Certification test user cleanup succeeded", users.GetById(userId) == null);
+            }
+        }
+
+        private static int CountUserCertificates(int userId, int courseId)
+        {
+            using (var connection = DbConnectionFactory.Open())
+            {
+                return Count(connection,
+                    "SELECT COUNT(1) FROM dbo.Certificates WHERE UserId = " + userId + " AND CourseId = " + courseId + ";");
+            }
         }
 
         // ------------------------------------------------------------------- plumbing --
