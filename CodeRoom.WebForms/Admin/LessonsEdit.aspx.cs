@@ -32,6 +32,7 @@ namespace CodeRoom.WebForms.Admin
         protected void SaveButton_Click(object sender,EventArgs e)
         {
             if(Auth.RequireAdmin(this))return;try{((SiteMaster)Master).ValidateCsrf();}catch(InvalidOperationException){return;}Page.Validate();if(!Page.IsValid)return;
+            if(!SafeUrl.IsAllowed(VideoUrl.Text)||!SafeUrl.IsAllowed(AudioUrl.Text)||!SafeUrl.IsAllowed(ResourceUrl.Text)){Toast.Error("Unsafe media link","Video, audio and resource URLs must start with http://, https:// or /.");return;}
             int id;if(!int.TryParse(LessonId.Value,out id)||id<=0){ShowNotFound();return;}
             var repo=new LessonRepository();var existing=repo.GetDetailedById(id);if(existing==null){ShowNotFound();return;}
             var courseId=int.Parse(CourseId.SelectedValue);if(new CourseRepository().GetById(courseId)==null)return;

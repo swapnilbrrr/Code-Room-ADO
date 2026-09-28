@@ -26,6 +26,10 @@ namespace CodeRoom.WebForms.Profile
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this)) return;
+
+            // The shared master form is url-encoded by default, which silently drops this page's file input.
+            Form.Enctype = "multipart/form-data";
+
             if (!IsPostBack)
             {
                 var user = new UserRepository().GetById(Auth.CurrentUserId);
@@ -114,11 +118,24 @@ namespace CodeRoom.WebForms.Profile
                     return;
                 }
 
+                byte[] bytes;
+                using (var buffer = new MemoryStream())
+                {
+                    AvatarFile.PostedFile.InputStream.CopyTo(buffer);
+                    bytes = buffer.ToArray();
+                }
+
+                if (bytes.Length == 0 || bytes.Length > 2 * 1024 * 1024 || !IsSupportedImage(bytes, extension))
+                {
+                    AddValidationError("That file is not a valid JPG, PNG or WebP image.");
+                    return;
+                }
+
                 var directory = Server.MapPath("~/uploads/avatars");
                 Directory.CreateDirectory(directory);
                 var fileName = Guid.NewGuid().ToString("N") + extension;
                 var filePath = Path.Combine(directory, fileName);
-                AvatarFile.SaveAs(filePath);
+                File.WriteAllBytes(filePath, bytes);
 
                 DeleteOwnedAvatar(user.AvatarUrl);
                 avatarUrl = "/uploads/avatars/" + fileName;
@@ -146,7 +163,7 @@ namespace CodeRoom.WebForms.Profile
                     "Profile updated",
                     passwordChangeRequested ? "Your profile and password have been updated successfully." : "Your profile details have been updated successfully.",
                     "/Profile/Index.aspx",
-                    "ProfileUpdated");
+                    DomainValues.NotificationType.Activity);
             }
 
             new LearningActivityService().TryRecordStreakMilestone(user.Id);
@@ -179,17 +196,28 @@ namespace CodeRoom.WebForms.Profile
 
         protected void ValidateAvatarUrl(object source, ServerValidateEventArgs args)
         {
-            var value = (args.Value ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(value)) { args.IsValid = true; return; }
-            Uri uri;
-            args.IsValid = Uri.TryCreate(value, UriKind.Absolute, out uri) &&
-                           (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) &&
-                           value.Length <= 300;
+            // Uploaded avatars are stored as /uploads/avatars/&lt;guid&gt;.png and the field is repopulated with
+            // that relative path, so rejecting it would block every later save.
+            args.IsValid = SafeUrl.IsAllowed((args.Value ?? string.Empty).Trim()) && (args.Value ?? string.Empty).Trim().Length <= 300;
         }
 
         protected void ValidatePassword(object source, ServerValidateEventArgs args)
         {
             args.IsValid = string.IsNullOrWhiteSpace(args.Value) || args.Value.Length >= 8;
+        }
+
+        private static bool IsSupportedImage(byte[] bytes, string extension)
+        {
+            if (bytes == null || bytes.Length < 12) return false;
+
+            if (extension == ".png")
+                return bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47;
+
+            if (extension == ".jpg" || extension == ".jpeg")
+                return bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF;
+
+            return bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46
+                && bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50;
         }
 
         private string SelectedTheme()

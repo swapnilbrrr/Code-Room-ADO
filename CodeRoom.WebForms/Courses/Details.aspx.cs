@@ -42,7 +42,9 @@ namespace CodeRoom.WebForms.Courses
                 EnsureEnrollmentToken();
             }
 
-            DataBind();
+            // The hero markup binds CourseModel.* even while CourseContent is hidden, so binding with a
+            // null course throws; the not-found panel is static and needs no DataBind.
+            if (CourseModel != null) DataBind();
         }
 
         protected void EnrollButton_Click(object sender, EventArgs e)
@@ -120,7 +122,7 @@ namespace CodeRoom.WebForms.Courses
             }
 
             CourseModel = courses.GetDetails(id);
-            if (CourseModel == null)
+            if (CourseModel == null || !CourseModel.IsPublished)
             {
                 ShowNotFound();
                 return;

@@ -34,6 +34,11 @@ namespace CodeRoom.WebForms.Admin
             if (Auth.RequireAdmin(this)) return;
             try { ((SiteMaster)Master).ValidateCsrf(); } catch (InvalidOperationException) { return; }
             Page.Validate(); if (!Page.IsValid) return;
+            if (!SafeUrl.IsAllowed(VideoUrl.Text) || !SafeUrl.IsAllowed(AudioUrl.Text) || !SafeUrl.IsAllowed(ResourceUrl.Text))
+            {
+                Toast.Error("Unsafe media link", "Video, audio and resource URLs must start with http://, https:// or /.");
+                return;
+            }
             int courseId=int.Parse(CourseId.SelectedValue);
             var course=new CourseRepository().GetById(courseId); if(course==null)return;
             var lesson=BuildLesson(0,courseId);

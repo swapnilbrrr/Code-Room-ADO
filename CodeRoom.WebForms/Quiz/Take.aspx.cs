@@ -13,6 +13,10 @@ namespace CodeRoom.WebForms.Quizzes
     public partial class Take : Page
     {
         private readonly QuizRepository quizzes = new QuizRepository();
+
+        // The client-side countdown is cosmetic; the deadline is only trustworthy when the server
+        // stamps the start time and rejects late submissions. Two minutes of grace absorb latency.
+        private static readonly TimeSpan Grace = TimeSpan.FromMinutes(2);
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this)) return;
@@ -36,7 +40,10 @@ namespace CodeRoom.WebForms.Quizzes
             SubmitHint.Text=quiz.IsCertificationExam ? "Passing this exam may unlock a certificate." : "You can review your score after submission.";
             SubmitButton.Text=quiz.IsCertificationExam ? "Submit examination" : "Submit answers"; TimerPanel.Visible=quiz.TimeLimitMinutes>0;
             QuestionsRepeater.DataSource=quiz.Questions; QuestionsRepeater.DataBind();
+            if (!IsPostBack && quiz.TimeLimitMinutes > 0) Session[StartKey(quiz.Id)] = DateTime.UtcNow;
         }
+
+        private static string StartKey(int quizId) { return "CR_QuizStart_" + quizId; }
         protected void SubmitButton_Click(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this)) return;
@@ -46,10 +53,26 @@ namespace CodeRoom.WebForms.Quizzes
             int quizId; if(!int.TryParse(QuizId.Value,out quizId)){ShowNotFound();return;}
             var quiz=quizzes.GetForTaking(quizId); if(quiz==null||quiz.Questions.Count==0){ShowNotFound();return;}
             if(!Auth.IsAdmin && !new EnrollmentRepository().IsEnrolled(Auth.CurrentUserId,quiz.CourseId)){Toast.Error("Enrollment required","Enroll in this course before taking the assessment.");Response.Redirect("~/Courses/Details.aspx?id="+quiz.CourseId,false);Context.ApplicationInstance.CompleteRequest();return;}
+            if (quiz.TimeLimitMinutes > 0)
+            {
+                var started = Session[StartKey(quiz.Id)] as DateTime?;
+                if (started == null)
+                {
+                    Toast.Error("Session expired", "Start the assessment again to submit answers.");
+                    LoadQuiz(); return;
+                }
+                if (DateTime.UtcNow - started.Value > TimeSpan.FromMinutes(quiz.TimeLimitMinutes) + Grace)
+                {
+                    Session.Remove(StartKey(quiz.Id));
+                    Toast.Error("Time expired", "The time limit for this assessment has passed.");
+                    return;
+                }
+            }
             var answers=new Dictionary<int,string>();
             foreach(var question in quiz.Questions){var value=Request.Form["answer_"+question.Id];if(!string.IsNullOrWhiteSpace(value))answers[question.Id]=value.Trim().ToUpperInvariant();}
             if(answers.Count!=quiz.Questions.Count){Toast.Error("Incomplete assessment","Please answer every question before submitting.");LoadQuiz();return;}
             var attempt=new LearningActivityService().SubmitQuiz(Auth.CurrentUserId,quiz,answers);
+            Session.Remove(StartKey(quiz.Id));
             Response.Redirect("~/Quiz/Results.aspx?id="+attempt.Id,false); Context.ApplicationInstance.CompleteRequest();
         }
         private static int GetRequiredScore(Quiz quiz){return string.Equals(quiz.AssessmentType,DomainValues.AssessmentType.Quiz,StringComparison.OrdinalIgnoreCase)?70:quiz.PassingScorePercent;}

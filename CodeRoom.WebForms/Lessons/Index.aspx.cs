@@ -39,6 +39,18 @@ namespace CodeRoom.WebForms.Lessons
         protected Lesson NextLesson { get; private set; }
         protected string ModuleName { get; private set; }
 
+        // Sibling Visible='<%# NextLesson != null %>' is bound in the same pass as the href, so the href
+        // expression must not dereference a null lesson on the first/last lesson of a course.
+        protected string PreviousLessonUrl { get { return LessonUrl(PreviousLesson); } }
+        protected string NextLessonUrl { get { return LessonUrl(NextLesson); } }
+
+        private string LessonUrl(Lesson lesson)
+        {
+            return lesson == null
+                ? string.Empty
+                : ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id + "&lessonId=" + lesson.Id);
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this))
@@ -240,6 +252,12 @@ namespace CodeRoom.WebForms.Lessons
             }
 
             Lessons = lessons.GetAllByCourse(courseId);
+
+            // Draft lessons stay reachable for administrators previewing a course, but a learner must not
+            // be able to open one by typing its id into the lessonId query string.
+            if (!Auth.IsAdmin)
+                Lessons = Lessons.Where(l => l.IsPublished).ToList();
+
             if (Lessons.Count == 0)
             {
                 ShowNotFound();

@@ -20,7 +20,10 @@ namespace CodeRoom.WebForms.Authentication
                 return;
             }
 
-            Csrf.EnsureToken(CsrfToken);
+            if (!IsPostBack)
+            {
+                Csrf.EnsureToken(CsrfToken);
+            }
         }
 
         protected void RegisterButton_Click(object sender, EventArgs e)
@@ -104,6 +107,7 @@ namespace CodeRoom.WebForms.Authentication
             }
             catch (InvalidOperationException ex)
             {
+                Csrf.EnsureToken(CsrfToken);
                 ShowError(ex.Message);
             }
         }

@@ -105,7 +105,7 @@
                     <div class="lesson-nav" aria-label="Lesson navigation">
                         <asp:PlaceHolder runat="server" Visible='<%# PreviousLesson != null %>'>
                             <a class="btn btn-secondary"
-                               href='<%# ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id + "&lessonId=" + PreviousLesson.Id) %>'>← Previous lesson</a>
+                               href='<%# PreviousLessonUrl %>'>← Previous lesson</a>
                         </asp:PlaceHolder>
                         <asp:PlaceHolder runat="server" Visible='<%# PreviousLesson == null %>'>
                             <span></span>
@@ -113,7 +113,7 @@
 
                         <asp:PlaceHolder runat="server" Visible='<%# NextLesson != null %>'>
                             <a class="btn btn-secondary"
-                               href='<%# ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id + "&lessonId=" + NextLesson.Id) %>'>Next lesson →</a>
+                               href='<%# NextLessonUrl %>'>Next lesson →</a>
                         </asp:PlaceHolder>
                     </div>
                 </main>

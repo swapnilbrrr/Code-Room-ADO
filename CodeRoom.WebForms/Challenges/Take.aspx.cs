@@ -30,7 +30,7 @@ namespace CodeRoom.WebForms.Challenges
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Auth.RequireLogin(this)) return;
-            Csrf.EnsureToken(CsrfToken);
+            if (!IsPostBack) Csrf.EnsureToken(CsrfToken);
 
             int challengeId;
             if (!int.TryParse(Request.QueryString["id"], out challengeId) || challengeId <= 0)
@@ -80,7 +80,7 @@ namespace CodeRoom.WebForms.Challenges
         {
             if (Auth.RequireLogin(this)) return;
             try { Csrf.Validate(CsrfToken); }
-            catch (InvalidOperationException) { Toast.Error("Security check failed", "Refresh the page and try again."); return; }
+            catch (InvalidOperationException) { Csrf.EnsureToken(CsrfToken); Toast.Error("Security check failed", "Refresh the page and try again."); return; }
 
             var challengeId = CurrentChallenge != null ? CurrentChallenge.Id : ParseId();
             if (challengeId <= 0) { ShowNotFound(); return; }

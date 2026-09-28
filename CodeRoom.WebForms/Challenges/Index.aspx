@@ -19,7 +19,7 @@
    <ItemTemplate>
     <a class="challenge-card" href='<%# ResolveUrl("~/Challenges/Take.aspx?id=" + Eval("Id")) %>'>
      <span class="challenge-number">+<%# Eval("Points") %> XP</span>
-     <h2><%# Eval("Title") %></h2><p><%# Eval("Instructions") %></p><span class="text-link">Start challenge →</span>
+     <h2><%#: Eval("Title") %></h2><p><%#: Eval("Instructions") %></p><span class="text-link">Start challenge →</span>
     </a>
    </ItemTemplate>
    <FooterTemplate></div></FooterTemplate>

@@ -21,9 +21,8 @@ namespace CodeRoom.WebForms.Authentication
             if (!IsPostBack)
             {
                 ReturnUrl.Value = GetSafeReturnUrl(Request.QueryString["returnUrl"]);
+                Csrf.EnsureToken(CsrfToken);
             }
-
-            Csrf.EnsureToken(CsrfToken);
         }
 
         protected void LoginButton_Click(object sender, EventArgs e)
@@ -58,6 +57,7 @@ namespace CodeRoom.WebForms.Authentication
             }
             catch (InvalidOperationException ex)
             {
+                Csrf.EnsureToken(CsrfToken);
                 ShowError(ex.Message);
             }
         }

@@ -29,6 +29,7 @@ namespace CodeRoom.WebForms
         protected global::System.Web.UI.WebControls.LinkButton FooterLogoutButton;
         protected global::System.Web.UI.WebControls.PlaceHolder PhAdminConsole;
         protected global::System.Web.UI.WebControls.PlaceHolder PhToast;
+        protected global::System.Web.UI.WebControls.Literal StylesheetLinks;
 
         protected global::System.Web.UI.UserControl Bell;
 

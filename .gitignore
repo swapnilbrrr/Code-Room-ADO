@@ -25,3 +25,8 @@ appsettings.Development.json
 *.db
 *.db-shm
 *.db-wal
+
+# Runtime diagnostics and user uploads
+App_Data/
+CodeRoom.WebForms/uploads/**
+!CodeRoom.WebForms/uploads/avatars/.gitkeep

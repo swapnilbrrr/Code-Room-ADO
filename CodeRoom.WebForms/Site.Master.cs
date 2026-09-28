@@ -20,6 +20,19 @@ namespace CodeRoom.WebForms
             get { return ConfigurationManager.AppSettings["AssetVersion"] ?? "1"; }
         }
 
+        // <%=%> blocks are not evaluated inside <head runat="server">, so the stylesheet links are
+        // emitted from code instead of inline markup.
+        private string BuildStylesheetLinks()
+        {
+            var version = System.Web.HttpUtility.HtmlAttributeEncode(AssetVersion);
+            return string.Format(
+                "<link rel=\"stylesheet\" href=\"{0}?v={1}\" />{2}<link rel=\"stylesheet\" href=\"{3}?v={1}\" />",
+                ResolveUrl("~/Assets/css/site.css"),
+                version,
+                Environment.NewLine,
+                ResolveUrl("~/Assets/css/ui-updates.css"));
+        }
+
         public void ValidateCsrf()
         {
             Csrf.Validate(MasterCsrfToken);
@@ -45,6 +58,8 @@ namespace CodeRoom.WebForms
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            StylesheetLinks.Text = BuildStylesheetLinks();
+
             if (!IsPostBack)
             {
                 Csrf.EnsureToken(MasterCsrfToken);
