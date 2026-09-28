@@ -66,7 +66,6 @@ namespace CodeRoom.WebForms.Services
                 transaction.Commit();
             }
 
-            TryRecordStreakMilestone(userId);
         }
 
         public void AwardAchievement(int userId, string code)
