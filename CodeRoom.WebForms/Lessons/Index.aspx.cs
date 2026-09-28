@@ -43,8 +43,12 @@ namespace CodeRoom.WebForms.Lessons
             if (!IsPostBack)
             {
                 EnsureCompletionToken();
-                DataBind();
             }
+
+            ContentParagraphsRepeater.DataSource = BuildParagraphs(CurrentLesson.Content);
+            ContentParagraphsRepeater.DataBind();
+            LessonsRepeater.DataSource = Lessons;
+            LessonsRepeater.DataBind();
         }
 
         protected void CompleteButton_Click(object sender, EventArgs e)
@@ -100,6 +104,55 @@ namespace CodeRoom.WebForms.Lessons
             {
                 Toast.Set("Unable to save progress", ex.Message, "!");
             }
+        }
+
+        protected class LessonParagraph
+        {
+            public bool IsSection { get; set; }
+            public string Label { get; set; }
+            public string Body { get; set; }
+        }
+
+        private static List<LessonParagraph> BuildParagraphs(string content)
+        {
+            var sectionLabels = new HashSet<string>(StringComparer.Ordinal)
+            {
+                "WHY IT MATTERS", "KEY CONCEPTS", "HOW TO THINK ABOUT IT",
+                "WORKED EXAMPLE", "IN PRACTICE", "COMMON MISTAKES", "PRACTICE FOCUS",
+                "CHECK YOURSELF", "KEY TAKEAWAY"
+            };
+
+            var paragraphs = new List<LessonParagraph>();
+            var rawParagraphs = (content ?? string.Empty)
+                .Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var raw in rawParagraphs)
+            {
+                var paragraph = raw.Trim();
+                var separator = paragraph.IndexOf(':');
+                var label = separator > 0 ? paragraph.Substring(0, separator).Trim() : string.Empty;
+
+                if (sectionLabels.Contains(label))
+                {
+                    paragraphs.Add(new LessonParagraph
+                    {
+                        IsSection = true,
+                        Label = label,
+                        Body = paragraph.Substring(separator + 1).Trim()
+                    });
+                }
+                else
+                {
+                    paragraphs.Add(new LessonParagraph
+                    {
+                        IsSection = false,
+                        Label = string.Empty,
+                        Body = paragraph
+                    });
+                }
+            }
+
+            return paragraphs;
         }
 
         protected string ContentTypeIcon(object value)
