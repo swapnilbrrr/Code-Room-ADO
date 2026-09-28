@@ -65,6 +65,32 @@ namespace CodeRoom.WebForms.Data
                 new SqlParameter("@Take", SqlDbType.Int) { Value = take });
         }
 
+        /// <summary>Existing enrollment activity descriptions, used to backfill legacy dashboard history without duplicates.</summary>
+        public List<string> GetEnrollmentDescriptions(int userId)
+        {
+            const string sql =
+                "SELECT Description FROM dbo.UserActivities " +
+                "WHERE UserId = @UserId AND ActivityType = @ActivityType;";
+
+            var rows = new List<string>();
+            using (var connection = DbConnectionFactory.Open())
+            using (var command = SqlHelper.Prepare(connection, null, sql))
+            {
+                SqlHelper.AddInt(command, "@UserId", userId);
+                SqlHelper.AddNVarChar(command, "@ActivityType", DomainValues.ActivityType.CourseEnrolled, 40);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        rows.Add(SqlHelper.GetString(reader, "Description"));
+                    }
+                }
+            }
+
+            return rows;
+        }
+
         public int CountByUser(int userId)
         {
             const string sql = "SELECT COUNT(1) FROM dbo.UserActivities WHERE UserId = @UserId;";
