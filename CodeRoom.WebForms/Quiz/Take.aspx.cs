@@ -6,6 +6,7 @@ using System.Web.UI.HtmlControls;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Models;
 using CodeRoom.WebForms.Services;
+using CodeRoom.WebForms.Helpers;
 
 namespace CodeRoom.WebForms.Quizzes
 {
@@ -23,7 +24,7 @@ namespace CodeRoom.WebForms.Quizzes
             if (!int.TryParse(Request.QueryString["id"], out quizId)) { ShowNotFound(); return; }
             var quiz = quizzes.GetForTaking(quizId);
             if (quiz == null || quiz.Questions.Count == 0) { ShowNotFound(); return; }
-            if (!Auth.IsAdmin && !new EnrollmentRepository().Exists(Auth.CurrentUserId, quiz.CourseId))
+            if (!Auth.IsAdmin && !new EnrollmentRepository().IsEnrolled(Auth.CurrentUserId, quiz.CourseId))
             {
                 Toast.Error("Enrollment required", "Enroll in this course before taking the assessment.");
                 Response.Redirect("~/Courses/Details.aspx?id=" + quiz.CourseId, false); Context.ApplicationInstance.CompleteRequest(); return;
