@@ -23,6 +23,7 @@ namespace CodeRoom.WebForms
             catch (Exception ex)
             {
                 Log("Initialization failed: " + ex);
+                throw;
             }
         }
 
