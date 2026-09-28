@@ -392,7 +392,7 @@ GO
 IF EXISTS (SELECT 1 FROM sys.check_constraints
            WHERE name = N'CK_Notifications_Type'
              AND parent_object_id = OBJECT_ID(N'dbo.Notifications')
-             AND definition NOT LIKE N'%LessonCompleted%' OR definition NOT LIKE N'%Challenge%')
+             AND (definition NOT LIKE N'%LessonCompleted%' OR definition NOT LIKE N'%Challenge%'))
 BEGIN
     ALTER TABLE dbo.Notifications DROP CONSTRAINT CK_Notifications_Type;
 END
