@@ -51,7 +51,15 @@
                     <article class="lesson-copy" data-lesson-content>
                         <asp:Repeater ID="ContentParagraphsRepeater" runat="server">
                             <ItemTemplate>
-                                <p><%#: Container.DataItem %></p>
+                                <asp:PlaceHolder runat="server" Visible='<%# Eval("IsSection") %>'>
+                                    <div class="lesson-copy-block">
+                                        <span class="lesson-section-label"><%#: Eval("Label") %></span>
+                                        <p><%#: Eval("Body") %></p>
+                                    </div>
+                                </asp:PlaceHolder>
+                                <asp:PlaceHolder runat="server" Visible='<%# !(bool)Eval("IsSection") %>'>
+                                    <p><%#: Eval("Body") %></p>
+                                </asp:PlaceHolder>
                             </ItemTemplate>
                         </asp:Repeater>
                     </article>
