@@ -11,5 +11,5 @@
 </div></section>
 </asp:Content>
 <asp:Content ID="cScripts" ContentPlaceHolderID="ScriptsContent" runat="server"><script>
-(() => { const timer=document.querySelector('[data-quiz-timer]'); const form=document.querySelector('form'); if(!timer||!form)return; let remaining=Number(timer.dataset.minutes||0)*60; if(!remaining)return; const render=()=>{const min=Math.floor(remaining/60),sec=remaining%60;timer.textContent='⏱ '+min+':'+String(sec).padStart(2,'0');if(remaining<=60)timer.classList.add('is-warning');};render();const handle=window.setInterval(()=>{remaining-=1;render();if(remaining<=0){window.clearInterval(handle);form.submit();}},1000);})();
+(() => { const timer=document.querySelector('[data-quiz-timer]'); const form=document.querySelector('form'); const submit=document.getElementById('<%= SubmitButton.ClientID %>'); if(!timer||!form||!submit)return; let remaining=Number(timer.dataset.minutes||0)*60; if(!remaining)return; const render=()=>{const min=Math.floor(remaining/60),sec=remaining%60;timer.textContent='⏱ '+min+':'+String(sec).padStart(2,'0');if(remaining<=60)timer.classList.add('is-warning');};render();const handle=window.setInterval(()=>{remaining-=1;render();if(remaining<=0){window.clearInterval(handle);submit.click();}},1000);})();
 </script></asp:Content>
