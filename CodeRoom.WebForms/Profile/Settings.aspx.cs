@@ -18,7 +18,7 @@ namespace CodeRoom.WebForms.Profile
         protected FileUpload AvatarFile;
         protected DropDownList ProfileVisibility;
         protected CheckBox EmailNotificationsEnabled;
-        protected RadioButton ThemeLight, ThemeDark, ThemeSystem;
+        protected HiddenField ThemePreference;
         protected Literal PreviewInitial, PreviewName, PreviewUsername;
         protected ValidationSummary ValidationSummary;
         protected Button SaveButton;
@@ -47,9 +47,11 @@ namespace CodeRoom.WebForms.Profile
             AvatarUrl.Text = user.AvatarUrl ?? string.Empty;
             ProfileVisibility.SelectedValue = user.ProfileVisibility == DomainValues.Visibility.Members ? DomainValues.Visibility.Members : DomainValues.Visibility.Public;
             EmailNotificationsEnabled.Checked = user.EmailNotificationsEnabled;
-            ThemeLight.Checked = string.Equals(user.ThemePreference, DomainValues.Theme.Light, StringComparison.OrdinalIgnoreCase);
-            ThemeDark.Checked = string.Equals(user.ThemePreference, DomainValues.Theme.Dark, StringComparison.OrdinalIgnoreCase);
-            ThemeSystem.Checked = !ThemeLight.Checked && !ThemeDark.Checked;
+            ThemePreference.Value = string.Equals(user.ThemePreference, DomainValues.Theme.Light, StringComparison.OrdinalIgnoreCase)
+                ? DomainValues.Theme.Light
+                : string.Equals(user.ThemePreference, DomainValues.Theme.Dark, StringComparison.OrdinalIgnoreCase)
+                    ? DomainValues.Theme.Dark
+                    : DomainValues.Theme.System;
             PreviewName.Text = Server.HtmlEncode(user.FullName);
             PreviewUsername.Text = Server.HtmlEncode(user.Username);
             PreviewInitial.Text = Server.HtmlEncode(string.IsNullOrWhiteSpace(user.FullName) ? "C" : user.FullName.Trim().Substring(0, 1).ToUpperInvariant());
@@ -222,8 +224,9 @@ namespace CodeRoom.WebForms.Profile
 
         private string SelectedTheme()
         {
-            if (ThemeLight.Checked) return DomainValues.Theme.Light;
-            if (ThemeDark.Checked) return DomainValues.Theme.Dark;
+            var value = (ThemePreference.Value ?? string.Empty).Trim().ToLowerInvariant();
+            if (value == DomainValues.Theme.Light.ToLowerInvariant()) return DomainValues.Theme.Light;
+            if (value == DomainValues.Theme.Dark.ToLowerInvariant()) return DomainValues.Theme.Dark;
             return DomainValues.Theme.System;
         }
 
