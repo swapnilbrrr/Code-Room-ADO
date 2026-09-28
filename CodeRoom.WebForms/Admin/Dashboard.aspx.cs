@@ -32,7 +32,7 @@ namespace CodeRoom.WebForms.Admin
                 QuizCount.Text = Number(row, "Quizzes");
                 CertificateCount.Text = Number(row, "Certificates");
                 ChallengeCount.Text = Number(row, "Challenges");
-                AdminCount.Text = Number(row, "Administrators");
+                AdminCount.Text = (Convert.ToInt32(row["Administrators"]) + Convert.ToInt32(row["SuperAdministrators"])).ToString(CultureInfo.InvariantCulture);
             }
 
             AuditCount.Text = repo.CountAuditEntries().ToString(CultureInfo.InvariantCulture);
