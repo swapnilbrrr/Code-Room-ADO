@@ -61,12 +61,20 @@
       <DependentUpon>Authentication\AccessDenied.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Authentication\Login.aspx.designer.cs">
+      <DependentUpon>Authentication\Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Authentication\Login.aspx.cs">
       <DependentUpon>Authentication\Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Authentication\Logout.aspx.cs">
       <DependentUpon>Authentication\Logout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Authentication\Register.aspx.designer.cs">
+      <DependentUpon>Authentication\Register.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Authentication\Register.aspx.cs">
@@ -129,6 +137,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\Auth.cs" />
+    <Compile Include="Helpers\Csrf.cs" />
     <Compile Include="Models\Achievement.cs" />
     <Compile Include="Models\AdminAuditLog.cs" />
     <Compile Include="Models\Announcement.cs" />
@@ -211,8 +220,6 @@
   <ItemGroup>
     <Content Include="About.aspx" />
     <Content Include="Admin\Dashboard.aspx" />
-    <None Include="App_Code\.gitkeep" />
-    <None Include="App_Data\.gitkeep" />
     <Content Include="Assets\css\site.css" />
     <Content Include="Assets\css\ui-updates.css" />
     <Content Include="Assets\images\code-room-logo-dark.svg" />
@@ -233,20 +240,17 @@
     <Content Include="Courses\Details.aspx" />
     <Content Include="Courses\Index.aspx" />
     <Content Include="Dashboard\MyDashboard.aspx" />
-    <None Include="Data\.gitkeep" />
     <Content Include="Default.aspx" />
     <Content Include="Error.aspx" />
     <Content Include="Faq.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Lessons\Index.aspx" />
-    <None Include="Models\.gitkeep" />
     <Content Include="Notifications\Index.aspx" />
     <Content Include="Profile\Index.aspx" />
     <Content Include="Profile\Settings.aspx" />
     <Content Include="Quiz\Results.aspx" />
     <Content Include="Quiz\Take.aspx" />
     <Content Include="Site.Master" />
-    <None Include="ViewModels\.gitkeep" />
     <None Include="uploads\avatars\.gitkeep" />
     <Content Include="Web.config" />
   </ItemGroup>
