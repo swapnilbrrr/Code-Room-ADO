@@ -11,9 +11,9 @@ namespace CodeRoom.WebForms.Admin
 {
     public partial class Dashboard : Page
     {
-        protected System.Web.UI.WebControls.Literal RoleBadge, UserCount, StudentCount, EnrollmentCount, AttemptCount, QuizCount, CertificateCount, ChallengeCount, AuditCount, AdminCount;
-        protected System.Web.UI.WebControls.Panel SuperAdminModule;
-        protected System.Web.UI.WebControls.Repeater RecentUsersRepeater, AuditRepeater;
+        protected global::System.Web.UI.WebControls.Literal RoleBadge, UserCount, StudentCount, EnrollmentCount, AttemptCount, QuizCount, CertificateCount, ChallengeCount, AuditCount, AdminCount;
+        protected global::System.Web.UI.WebControls.Panel SuperAdminModule;
+        protected global::System.Web.UI.WebControls.Repeater RecentUsersRepeater, AuditRepeater;
 
         protected void Page_Load(object sender, EventArgs e)
         {
