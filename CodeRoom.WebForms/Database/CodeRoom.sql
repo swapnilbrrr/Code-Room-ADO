@@ -401,7 +401,7 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = N'CK_Notifications_Type' AND parent_object_id = OBJECT_ID(N'dbo.Notifications'))
 BEGIN
     ALTER TABLE dbo.Notifications ADD CONSTRAINT CK_Notifications_Type
-        CHECK ([Type] IN (N'Announcement', N'Activity', N'StreakMilestone', N'Achievement', N'Certificate', N'CourseCompleted', N'ExamPassed', N'QuizCompleted', N'Challenge'));
+        CHECK ([Type] IN (N'Announcement', N'Activity', N'StreakMilestone', N'Achievement', N'Certificate', N'CourseCompleted', N'LessonCompleted', N'ExamPassed', N'QuizCompleted', N'Challenge'));
 END
 GO
 
