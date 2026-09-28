@@ -181,6 +181,77 @@ namespace CodeRoom.WebForms.Services
             return true;
         }
 
+        public QuizAttempt SubmitQuiz(int userId, Quiz quiz, Dictionary<int, string> answers)
+        {
+            if (quiz == null || quiz.Questions == null || quiz.Questions.Count == 0)
+                throw new InvalidOperationException("The requested assessment could not be found.");
+
+            var normalizedAnswers = answers ?? new Dictionary<int, string>();
+            var score = quiz.Questions.Count(question =>
+            {
+                string chosen;
+                return normalizedAnswers.TryGetValue(question.Id, out chosen) &&
+                       string.Equals(chosen, question.CorrectOption, StringComparison.OrdinalIgnoreCase);
+            });
+            var percentage = (int)Math.Round(score * 100.0 / quiz.Questions.Count, MidpointRounding.AwayFromZero);
+            var passed = new QuizRepository().HasPassed(quiz, percentage);
+            var user = users.GetById(userId);
+            if (user == null) throw new InvalidOperationException("The learner account could not be found.");
+
+            using (var connection = DbConnectionFactory.Open())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                if (!EnrollmentExists(connection, transaction, userId, quiz.CourseId))
+                    throw new InvalidOperationException("Enroll in this course before taking the assessment.");
+
+                var attempt = new QuizAttempt
+                {
+                    UserId = userId, QuizId = quiz.Id, Score = score,
+                    TotalQuestions = quiz.Questions.Count, AttemptedAt = DateTime.UtcNow, Quiz = quiz
+                };
+                attempt.Id = new QuizAttemptRepository().Insert(connection, transaction, attempt);
+
+                var activityType = passed && quiz.IsCertificationExam ? DomainValues.ActivityType.ExamPassed : DomainValues.ActivityType.QuizAttempted;
+                var notificationType = passed && quiz.IsCertificationExam ? DomainValues.NotificationType.ExamPassed : DomainValues.NotificationType.QuizCompleted;
+                var currentXp = RecordInsideTransaction(
+                    connection, transaction, user, activityType,
+                    "Completed " + quiz.Title + " with " + percentage + "%",
+                    passed ? "Assessment passed" : "Quiz completed",
+                    "You scored " + score + "/" + quiz.Questions.Count + " (" + percentage + "%) in " + quiz.Title + ".",
+                    "/Quiz/Results.aspx?id=" + attempt.Id, notificationType,
+                    passed && quiz.IsCertificationExam ? 150 : null);
+                AwardEligibleAchievements(connection, transaction, userId, activityType, currentXp);
+
+                if (passed && quiz.IsCertificationExam)
+                {
+                    var certificates = new CertificateRepository();
+                    if (!certificates.ExistsForUserAndCourse(userId, quiz.CourseId))
+                    {
+                        var course = CourseRepository.GetByIdForTransaction(connection, transaction, quiz.CourseId);
+                        var certificate = new Certificate
+                        {
+                            UserId = userId, CourseId = quiz.CourseId, QuizAttemptId = attempt.Id,
+                            CertificateNumber = CertificateRepository.FormatNumber(quiz.CourseId, userId, attempt.Id),
+                            Title = course != null && !string.IsNullOrWhiteSpace(course.CertificateName) ? course.CertificateName : quiz.Title + " Certificate",
+                            IssuedAt = DateTime.UtcNow
+                        };
+                        certificate.Id = certificates.Insert(connection, transaction, certificate);
+                        var certificateXp = RecordInsideTransaction(
+                            connection, transaction, user, DomainValues.ActivityType.CertificateEarned,
+                            "Earned " + certificate.Title, "Certificate unlocked",
+                            "You passed the certification examination and earned a Code-Room certificate.",
+                            "/Certificates/Details.aspx?id=" + certificate.Id,
+                            DomainValues.NotificationType.Certificate, 200);
+                        AwardEligibleAchievements(connection, transaction, userId, DomainValues.ActivityType.CertificateEarned, certificateXp);
+                    }
+                }
+
+                transaction.Commit();
+                TryRecordStreakMilestone(userId);
+                return attempt;
+            }
+        }
+
         private int RecordInsideTransaction(
             SqlConnection connection,
             SqlTransaction transaction,
