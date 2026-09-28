@@ -9,8 +9,8 @@ namespace CodeRoom.WebForms
         protected void Application_Start(object sender, EventArgs e)
         {
             // Prepare CodeRoomDb (create it when missing, apply the guarded schema script, seed the
-            // baseline content) before the first request is served. A failed run is written to
-            // App_Data\Startup.log instead of taking the whole application down.
+            // baseline content) before the first request is served. Initialization failures are
+            // logged and rethrown so the application cannot start against a broken schema.
             try
             {
                 var result = DatabaseInitializer.InitializeWithSeedData();
