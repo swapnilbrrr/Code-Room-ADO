@@ -71,7 +71,7 @@ namespace CodeRoom.WebForms.Authentication
         {
             if (string.IsNullOrWhiteSpace(value)) return string.Empty;
             if (value[0] != '/') return string.Empty;
-            if (value.Length > 1 && (value[1] == '/' || value[1] == '\')) return string.Empty;
+            if (value.Length > 1 && (value[1] == '/' || value[1] == '\\')) return string.Empty;
             return value;
         }
     }
