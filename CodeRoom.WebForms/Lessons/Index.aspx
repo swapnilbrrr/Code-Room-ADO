@@ -57,7 +57,7 @@
                                         <p><%#: Eval("Body") %></p>
                                     </div>
                                 </asp:PlaceHolder>
-                                <asp:PlaceHolder runat="server" Visible='<%# !(bool)Eval("IsSection") %>'>
+                                <asp:PlaceHolder runat="server" Visible='<%# !Convert.ToBoolean(Eval("IsSection")) %>'>
                                     <p><%#: Eval("Body") %></p>
                                 </asp:PlaceHolder>
                             </ItemTemplate>
