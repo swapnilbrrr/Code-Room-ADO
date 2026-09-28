@@ -48,7 +48,7 @@
                         ErrorMessage="Email is required." CssClass="field-error" Display="Dynamic" />
                     <asp:RegularExpressionValidator ID="EmailFormat" runat="server"
                         ControlToValidate="Email" ValidationGroup="Register"
-                        ValidationExpression="^[^@s]+@[^@s]+.[^@s]+$"
+                        ValidationExpression="^[^@\s]+@[^@\s]+\.[^@\s]+$"
                         ErrorMessage="Enter a valid email address."
                         CssClass="field-error" Display="Dynamic" />
                 </label>
@@ -62,7 +62,7 @@
                         ErrorMessage="Password is required." CssClass="field-error" Display="Dynamic" />
                     <asp:RegularExpressionValidator ID="PasswordFormat" runat="server"
                         ControlToValidate="Password" ValidationGroup="Register"
-                        ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*d).{8,128}$"
+                        ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$"
                         ErrorMessage="Use 8+ characters with upper, lower and a number."
                         CssClass="field-error" Display="Dynamic" />
                 </label>
