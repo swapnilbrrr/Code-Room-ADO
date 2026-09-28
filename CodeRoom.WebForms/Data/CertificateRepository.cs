@@ -102,6 +102,14 @@ namespace CodeRoom.WebForms.Data
             return SqlHelper.GetTable(sql);
         }
 
+        public int CountByUser(int userId)
+        {
+            const string sql = "SELECT COUNT(1) FROM dbo.Certificates WHERE UserId = @UserId;";
+
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(sql,
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId }));
+        }
+
         public int CountAll()
         {
             return Convert.ToInt32(SqlHelper.ExecuteScalar("SELECT COUNT(1) FROM dbo.Certificates;"));
