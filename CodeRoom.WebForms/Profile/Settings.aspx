@@ -26,11 +26,39 @@
    <label>Confirm new password<asp:TextBox ID="ConfirmNewPassword" runat="server" CssClass="input" TextMode="Password" autocomplete="new-password" /></label>
   </div></section>
   <section class="settings-card settings-section-card" id="notifications"><div class="settings-card-heading"><div><h2>Notifications</h2><p>Choose how much activity reaches your account feed.</p></div></div><label class="switch-row"><span><strong>Activity notifications</strong><small>Show achievements, streaks, course and assessment updates in the notification centre.</small></span><asp:CheckBox ID="EmailNotificationsEnabled" runat="server" CssClass="switch-input" /></label></section>
-  <section class="settings-card settings-section-card" id="appearance"><div class="settings-card-heading"><div><h2>Appearance</h2><p>Choose the visual mode used by Code-Room.</p></div></div><div class="segmented-control" data-theme-setting><asp:RadioButton ID="ThemeLight" runat="server" GroupName="Theme" Text="Light" /><asp:RadioButton ID="ThemeDark" runat="server" GroupName="Theme" Text="Dark" /><asp:RadioButton ID="ThemeSystem" runat="server" GroupName="Theme" Text="System" /></div></section>
+  <section class="settings-card settings-section-card" id="appearance"><div class="settings-card-heading"><div><h2>Appearance</h2><p>Choose the visual mode used by Code-Room.</p></div></div><asp:HiddenField ID="ThemePreference" runat="server" /><div class="theme-options" data-theme-setting role="group" aria-label="Theme preference"><button type="button" class="theme-option" data-theme-choice="light"><span class="theme-option-icon">☀</span><span><strong>Light</strong><small>Bright interface</small></span></button><button type="button" class="theme-option" data-theme-choice="dark"><span class="theme-option-icon">☾</span><span><strong>Dark</strong><small>Low-light interface</small></span></button><button type="button" class="theme-option" data-theme-choice="system"><span class="theme-option-icon">◐</span><span><strong>System</strong><small>Follow device setting</small></span></button></div></section>
   <div class="settings-savebar"><span>Changes are stored in your Code-Room account.</span><asp:Button ID="SaveButton" runat="server" CssClass="btn btn-primary" Text="Save settings" OnClick="SaveButton_Click" CausesValidation="true" /></div>
  </div>
 </div></section>
 </asp:Content>
 <asp:Content ID="cScripts" ContentPlaceHolderID="ScriptsContent" runat="server"><script>
-document.querySelectorAll('[data-theme-setting] input').forEach(function(input){input.addEventListener('change',function(){if(input.checked){localStorage.setItem('code-room-theme',input.value||'light');document.documentElement.dataset.theme=input.value||'light';}});});
+(function () {
+    var field = document.getElementById('<%= ThemePreference.ClientID %>');
+    var options = document.querySelectorAll('[data-theme-choice]');
+    var preference = (field && field.value ? field.value : localStorage.getItem('code-room-theme') || 'system').toLowerCase();
+
+    function applyTheme(value) {
+        preference = value;
+        if (field) field.value = value;
+        localStorage.setItem('code-room-theme', value);
+        document.documentElement.dataset.themePreference = value;
+        var resolved = value === 'system'
+            ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : value;
+        document.documentElement.dataset.theme = resolved;
+        options.forEach(function (button) {
+            var active = button.getAttribute('data-theme-choice') === value;
+            button.classList.toggle('is-selected', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    options.forEach(function (button) {
+        button.addEventListener('click', function () {
+            applyTheme(button.getAttribute('data-theme-choice'));
+        });
+    });
+
+    applyTheme(preference);
+})();
 </script></asp:Content>
