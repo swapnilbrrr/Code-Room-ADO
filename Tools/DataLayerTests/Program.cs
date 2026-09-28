@@ -354,6 +354,16 @@ namespace CodeRoom.DataLayerTests
             Check("Enrollment created", enrollments.IsEnrolled(userId, courseId));
 
             var lessonId = LessonRepository.GetByCourse(courseId).First().Id;
+            var activityLesson = LessonRepository.GetByCourse(courseId).Skip(1).First();
+            var activityBefore = users.GetById(userId).Xp;
+            var completedByService = new LearningActivityService().CompleteLesson(
+                userId, activityLesson.Id, courseId, activityLesson.Title, courses.GetById(courseId).Title);
+            Check("LearningActivityService completes a lesson atomically", completedByService && progress.IsCompleted(userId, activityLesson.Id));
+            Check("Lesson completion awards XP", users.GetById(userId).Xp > activityBefore);
+            Check("Lesson completion records activity", new ActivityRepository().CountByUser(userId) > 0);
+            Check("Lesson completion writes a typed notification",
+                new NotificationRepository().GetByUser(userId, 50).Any(n => n.Type == DomainValues.NotificationType.LessonCompletion));
+
             Check("First completion reports true", progress.MarkCompleted(userId, lessonId));
             Check("Repeat completion reports false", !progress.MarkCompleted(userId, lessonId));
             Check("Progress row readable", progress.Get(userId, lessonId) != null);
