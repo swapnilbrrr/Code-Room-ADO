@@ -50,14 +50,14 @@ namespace CodeRoom.WebForms.Admin
         }
 
         private Lesson BuildLesson(int id,int courseId){return new Lesson{Id=id,CourseId=courseId,Title=Title.Text.Trim(),Summary=string.IsNullOrWhiteSpace(SummaryText.Text)?null:SummaryText.Text.Trim(),Content=Content.Text,ContentType=ContentType.SelectedValue,VideoUrl=NullIfBlank(VideoUrl.Text),AudioUrl=NullIfBlank(AudioUrl.Text),ResourceUrl=NullIfBlank(ResourceUrl.Text),Order=int.Parse(Order.Text),DurationMinutes=int.Parse(DurationMinutes.Text),IsPublished=IsPublished.Checked};}
-        private CourseModule EnsureModule(System.Data.SqlClient.SqlConnection c,System.Data.SqlClient.SqlTransaction t,int courseId)
+        private CourseModule EnsureModule(global::System.Data.SqlClient.SqlConnection c,global::System.Data.SqlClient.SqlTransaction t,int courseId)
         {
             const string sql = "SELECT TOP (1) m.Id, m.CourseId, m.Title, m.Description, m.ModuleOrder " +
                 "FROM dbo.CourseModules AS m LEFT JOIN dbo.Lessons AS l ON l.CourseModuleId = m.Id " +
                 "WHERE m.CourseId = @CourseId GROUP BY m.Id, m.CourseId, m.Title, m.Description, m.ModuleOrder " +
                 "ORDER BY COUNT(l.Id), m.ModuleOrder, m.Id;";
             var module = SqlHelper.ReadFirst(c, t, sql, CourseModuleRepository.Map,
-                new System.Data.SqlClient.SqlParameter("@CourseId", System.Data.SqlDbType.Int) { Value = courseId });
+                new global::System.Data.SqlClient.SqlParameter("@CourseId", global::System.Data.SqlDbType.Int) { Value = courseId });
             if (module != null) return module;
 
             var created = new CourseModule { CourseId = courseId, Title = "Module 1 — Foundations",
