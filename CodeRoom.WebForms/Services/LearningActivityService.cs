@@ -181,6 +181,55 @@ namespace CodeRoom.WebForms.Services
             return true;
         }
 
+        public bool CompleteChallenge(int userId, Challenge challenge)
+        {
+            if (challenge == null) throw new ArgumentNullException("challenge");
+
+            var user = users.GetById(userId);
+            if (user == null) throw new InvalidOperationException("The learner account could not be found.");
+
+            using (var connection = DbConnectionFactory.Open())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                const string existsSql =
+                    "SELECT COUNT(1) FROM dbo.UserActivities WHERE UserId = @UserId " +
+                    "AND ActivityType = @ActivityType AND Description = @Description;";
+
+                bool alreadyCompleted;
+                using (var command = SqlHelper.Prepare(connection, transaction, existsSql))
+                {
+                    SqlHelper.AddInt(command, "@UserId", userId);
+                    SqlHelper.AddNVarChar(command, "@ActivityType", DomainValues.ActivityType.ChallengeCompleted, 60);
+                    SqlHelper.AddNVarChar(command, "@Description", "Completed " + challenge.Title, 500);
+                    alreadyCompleted = Convert.ToInt32(command.ExecuteScalar()) > 0;
+                }
+
+                if (alreadyCompleted)
+                {
+                    transaction.Commit();
+                    return false;
+                }
+
+                var currentXp = RecordInsideTransaction(
+                    connection, transaction, user,
+                    DomainValues.ActivityType.ChallengeCompleted,
+                    "Completed " + challenge.Title,
+                    "Challenge completed",
+                    "Nice work. You earned " + challenge.Points + " XP from " + challenge.Title + ".",
+                    "/Challenges/Take.aspx?id=" + challenge.Id,
+                    DomainValues.NotificationType.Challenge,
+                    null);
+
+                AwardEligibleAchievements(connection, transaction, userId,
+                    DomainValues.ActivityType.ChallengeCompleted, currentXp);
+
+                transaction.Commit();
+            }
+
+            TryRecordStreakMilestone(userId);
+            return true;
+        }
+
         public QuizAttempt SubmitQuiz(int userId, Quiz quiz, Dictionary<int, string> answers)
         {
             if (quiz == null || quiz.Questions == null || quiz.Questions.Count == 0)
