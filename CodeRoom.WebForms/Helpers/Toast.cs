@@ -25,6 +25,10 @@ namespace CodeRoom.WebForms.Helpers
             session[KeyIcon] = icon;
         }
 
+        public static void Success(string title, string message) { Set(title, message, "✓"); }
+        public static void Error(string title, string message) { Set(title, message, "!"); }
+        public static void Info(string title, string message) { Set(title, message, "i"); }
+
         public static bool HasTitle
         {
             get { return Read(KeyTitle) != null; }
