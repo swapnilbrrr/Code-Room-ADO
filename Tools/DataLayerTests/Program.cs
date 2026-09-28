@@ -268,6 +268,12 @@ namespace CodeRoom.DataLayerTests
             }
 
             Console.WriteLine("       Running the seed a second time to prove idempotency...");
+            int resourceCountBeforeReseed;
+            using (var connection = DbConnectionFactory.Open())
+            {
+                resourceCountBeforeReseed = Count(connection, "SELECT COUNT(1) FROM dbo.Resources;");
+            }
+
             var second = DbSeeder.Seed();
             Check("Second seed run creates no rows", second.TotalRowsCreated == 0, second.TotalRowsCreated + " rows");
             Check("Second seed run repairs no rows", second.UsersRepaired == 0 && second.LessonsRepaired == 0);
@@ -277,7 +283,7 @@ namespace CodeRoom.DataLayerTests
                 Check("Course count unchanged after re-seeding", Count(connection, "SELECT COUNT(1) FROM dbo.Courses;") == 20);
                 Check("Question count unchanged after re-seeding", Count(connection, "SELECT COUNT(1) FROM dbo.Questions;") == 100);
                 Check("Resource count unchanged after re-seeding",
-                    Count(connection, "SELECT COUNT(1) FROM dbo.Resources;") == Count(connection, "SELECT COUNT(1) FROM dbo.Resources;"));
+                    Count(connection, "SELECT COUNT(1) FROM dbo.Resources;") == resourceCountBeforeReseed);
             }
         }
 
