@@ -1,0 +1,21 @@
+name: Web Forms Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Web Forms solution
+        shell: pwsh
+        run: msbuild CodeRoom.sln /m /p:Configuration=Debug /p:Platform="Any CPU"
+
+      - name: Build data-layer test harness
+        shell: pwsh
+        run: msbuild Tools/DataLayerTests/DataLayerTests.csproj /m /p:Configuration=Debug
