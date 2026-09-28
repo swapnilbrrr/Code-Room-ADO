@@ -53,6 +53,110 @@
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Admin\Announcements.aspx.cs">
+      <DependentUpon>Admin\Announcements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\AnnouncementsCreate.aspx.cs">
+      <DependentUpon>Admin\AnnouncementsCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\AnnouncementsEdit.aspx.cs">
+      <DependentUpon>Admin\AnnouncementsEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Audit.aspx.cs">
+      <DependentUpon>Admin\Audit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Challenges.aspx.cs">
+      <DependentUpon>Admin\Challenges.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\ChallengesCreate.aspx.cs">
+      <DependentUpon>Admin\ChallengesCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\ChallengesEdit.aspx.cs">
+      <DependentUpon>Admin\ChallengesEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Courses.aspx.cs">
+      <DependentUpon>Admin\Courses.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\CoursesCreate.aspx.cs">
+      <DependentUpon>Admin\CoursesCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\CoursesEdit.aspx.cs">
+      <DependentUpon>Admin\CoursesEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Lessons.aspx.cs">
+      <DependentUpon>Admin\Lessons.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\LessonsCreate.aspx.cs">
+      <DependentUpon>Admin\LessonsCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\LessonsEdit.aspx.cs">
+      <DependentUpon>Admin\LessonsEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Quizzes.aspx.cs">
+      <DependentUpon>Admin\Quizzes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\QuizzesCreate.aspx.cs">
+      <DependentUpon>Admin\QuizzesCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\QuizzesEdit.aspx.cs">
+      <DependentUpon>Admin\QuizzesEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\QuizzesManage.aspx.cs">
+      <DependentUpon>Admin\QuizzesManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\QuizzesQuestionCreate.aspx.cs">
+      <DependentUpon>Admin\QuizzesQuestionCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\QuizzesQuestionEdit.aspx.cs">
+      <DependentUpon>Admin\QuizzesQuestionEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Resources.aspx.cs">
+      <DependentUpon>Admin\Resources.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\ResourcesCreate.aspx.cs">
+      <DependentUpon>Admin\ResourcesCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\ResourcesEdit.aspx.cs">
+      <DependentUpon>Admin\ResourcesEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\System.aspx.cs">
+      <DependentUpon>Admin\System.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Users.aspx.cs">
+      <DependentUpon>Admin\Users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\UsersCreate.aspx.cs">
+      <DependentUpon>Admin\UsersCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\UsersEdit.aspx.cs">
+      <DependentUpon>Admin\UsersEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Admin\Dashboard.aspx.cs">
       <DependentUpon>Admin\Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -232,6 +336,32 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Admin\Announcements.aspx" />
+    <Content Include="Admin\AnnouncementsCreate.aspx" />
+    <Content Include="Admin\AnnouncementsEdit.aspx" />
+    <Content Include="Admin\Audit.aspx" />
+    <Content Include="Admin\Challenges.aspx" />
+    <Content Include="Admin\ChallengesCreate.aspx" />
+    <Content Include="Admin\ChallengesEdit.aspx" />
+    <Content Include="Admin\Courses.aspx" />
+    <Content Include="Admin\CoursesCreate.aspx" />
+    <Content Include="Admin\CoursesEdit.aspx" />
+    <Content Include="Admin\Lessons.aspx" />
+    <Content Include="Admin\LessonsCreate.aspx" />
+    <Content Include="Admin\LessonsEdit.aspx" />
+    <Content Include="Admin\Quizzes.aspx" />
+    <Content Include="Admin\QuizzesCreate.aspx" />
+    <Content Include="Admin\QuizzesEdit.aspx" />
+    <Content Include="Admin\QuizzesManage.aspx" />
+    <Content Include="Admin\QuizzesQuestionCreate.aspx" />
+    <Content Include="Admin\QuizzesQuestionEdit.aspx" />
+    <Content Include="Admin\Resources.aspx" />
+    <Content Include="Admin\ResourcesCreate.aspx" />
+    <Content Include="Admin\ResourcesEdit.aspx" />
+    <Content Include="Admin\System.aspx" />
+    <Content Include="Admin\Users.aspx" />
+    <Content Include="Admin\UsersCreate.aspx" />
+    <Content Include="Admin\UsersEdit.aspx" />
     <Content Include="Admin\Dashboard.aspx" />
     <Content Include="Assets\css\site.css" />
     <Content Include="Assets\css\ui-updates.css" />
