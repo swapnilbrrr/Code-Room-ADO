@@ -219,7 +219,7 @@ namespace CodeRoom.WebForms.Services
                     passed ? "Assessment passed" : "Quiz completed",
                     "You scored " + score + "/" + quiz.Questions.Count + " (" + percentage + "%) in " + quiz.Title + ".",
                     "/Quiz/Results.aspx?id=" + attempt.Id, notificationType,
-                    passed && quiz.IsCertificationExam ? 150 : null);
+                    passed && quiz.IsCertificationExam ? (int?)150 : null);
                 AwardEligibleAchievements(connection, transaction, userId, activityType, currentXp);
 
                 if (passed && quiz.IsCertificationExam)
