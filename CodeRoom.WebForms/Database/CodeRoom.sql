@@ -377,7 +377,7 @@ BEGIN
         IsRead    BIT           NOT NULL
             CONSTRAINT DF_Notifications_IsRead DEFAULT (0),
         CONSTRAINT PK_Notifications PRIMARY KEY (Id),
-        CONSTRAINT CK_Notifications_Type CHECK ([Type] IN (N'Announcement', N'Activity', N'StreakMilestone', N'Achievement', N'Certificate', N'CourseCompleted', N'ExamPassed', N'QuizCompleted'))
+        CONSTRAINT CK_Notifications_Type CHECK ([Type] IN (N'Announcement', N'Activity', N'StreakMilestone', N'Achievement', N'Certificate', N'CourseCompleted', N'LessonCompleted', N'ExamPassed', N'QuizCompleted'))
     );
 END
 GO
@@ -392,7 +392,7 @@ GO
 IF EXISTS (SELECT 1 FROM sys.check_constraints
            WHERE name = N'CK_Notifications_Type'
              AND parent_object_id = OBJECT_ID(N'dbo.Notifications')
-             AND definition NOT LIKE N'%ExamPassed%')
+             AND definition NOT LIKE N'%LessonCompleted%')
 BEGIN
     ALTER TABLE dbo.Notifications DROP CONSTRAINT CK_Notifications_Type;
 END
