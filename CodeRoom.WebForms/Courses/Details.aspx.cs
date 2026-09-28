@@ -22,6 +22,17 @@ namespace CodeRoom.WebForms.Courses
         protected bool IsAuthenticated { get { return Auth.IsLoggedIn; } }
         protected bool IsEnrolled { get; private set; }
 
+        protected string LoginToStartUrl
+        {
+            get
+            {
+                if (CourseModel == null) return ResolveUrl("~/Authentication/Login.aspx");
+
+                var returnUrl = ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id);
+                return ResolveUrl("~/Authentication/Login.aspx?returnUrl=" + Server.UrlEncode(returnUrl));
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             LoadCourse();
@@ -156,6 +167,8 @@ namespace CodeRoom.WebForms.Courses
 
         private void ShowNotFound()
         {
+            Response.StatusCode = 404;
+            Response.TrySkipIisCustomErrors = true;
             CourseContent.Visible = false;
             CourseNotFound.Visible = true;
             Resources = new List<Resource>();
