@@ -9,10 +9,6 @@ using CodeRoom.WebForms.Services;
 
 namespace CodeRoom.WebForms.Helpers
 {
-    /// <summary>
-    /// Authentication boundary for Code-Room. Forms Authentication owns the protected browser
-    /// ticket; Session holds the current user snapshot consumed by the Web Forms UI.
-    /// </summary>
     public static class Auth
     {
         private const string KeyUserId = "CR_UserId";
@@ -263,7 +259,7 @@ namespace CodeRoom.WebForms.Helpers
         {
             return !string.IsNullOrEmpty(url)
                 && url[0] == '/'
-                && (url.Length == 1 || (url[1] != '/' && url[1] != '\'));
+                && (url.Length == 1 || (url[1] != '/' && url[1] != '\\'));
         }
     }
 }
