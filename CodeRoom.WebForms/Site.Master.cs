@@ -22,6 +22,17 @@ namespace CodeRoom.WebForms
 
         protected void LogoutButton_Click(object sender, EventArgs e)
         {
+            try
+            {
+                Csrf.Validate(MasterCsrfToken);
+            }
+            catch (InvalidOperationException)
+            {
+                Response.Redirect(ResolveUrl("~/Authentication/Login.aspx"), false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
             Auth.SignOut();
             Response.Redirect(ResolveUrl("~/Default.aspx"), false);
             Context.ApplicationInstance.CompleteRequest();
