@@ -1,17 +1,8 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Verify.aspx.cs" Inherits="CodeRoom.WebForms.Certificates.Verify" MasterPageFile="~/Site.Master" %>
-
 <asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Verify certificate - Code-Room</asp:Content>
-
-<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>Verify a certificate</h1>
-            <p class="page-intro">Enter a certificate number to check its validity.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
-</asp:Content>
+<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server"><section class="page-shell"><div class="container certificate-page"><div class="content-panel verification-card">
+<span class="eyebrow">CREDENTIAL VERIFICATION</span><h1 class="page-title">Verify a Code-Room certificate</h1><p class="page-intro">Enter the certificate number shown on a Code-Room credential.</p>
+<form method="get" class="verification-form"><label>Certificate number<asp:TextBox ID="Number" runat="server" CssClass="input" placeholder="e.g. CR-004-007-00021" /></label><asp:Button ID="VerifyButton" runat="server" CssClass="btn btn-primary" Text="Verify credential" OnClick="VerifyButton_Click" CausesValidation="false" /></form>
+<asp:Panel ID="FailedPanel" runat="server" CssClass="result-status result-failed" Visible="false"><strong>Certificate not found</strong><span>Check the number and try again.</span></asp:Panel>
+<asp:Panel ID="ResultPanel" runat="server" CssClass="verification-result" Visible="false"><span class="verification-check">✓</span><div><span class="eyebrow">VERIFIED</span><h2><asp:Literal ID="ResultTitle" runat="server" /></h2><p>Awarded to <strong><asp:Literal ID="ResultUser" runat="server" /></strong> for completing <strong><asp:Literal ID="ResultCourse" runat="server" /></strong>.</p><div class="certificate-meta"><span><small>Certificate ID</small><strong><asp:Literal ID="ResultNumber" runat="server" /></strong></span><span><small>Issued</small><strong><asp:Literal ID="ResultDate" runat="server" /></strong></span></div></div></asp:Panel>
+</div></div></section></asp:Content>
