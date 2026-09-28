@@ -382,13 +382,13 @@ namespace CodeRoom.WebForms.Data
                     report.QuizzesCreated++;
                     SeedQuestions(connection, transaction, quizId, seed.Questions, report);
                 }
-                else if (CountRows(connection, transaction, "SELECT COUNT(1) FROM dbo.Questions WHERE QuizId = @Id;", quizId) == 0)
+                else if (CountRows(connection, transaction, "SELECT COUNT(1) FROM dbo.Questions WHERE QuizId = @CourseId;", quizId) == 0)
                 {
                     SeedQuestions(connection, transaction, quizId, seed.Questions, report);
                 }
 
                 if (seed.Challenges.Length > 0
-                    && CountRows(connection, transaction, "SELECT COUNT(1) FROM dbo.Challenges WHERE CourseId = @Id;", courseId) == 0)
+                    && CountRows(connection, transaction, "SELECT COUNT(1) FROM dbo.Challenges WHERE CourseId = @CourseId;", courseId) == 0)
                 {
                     foreach (var challenge in seed.Challenges)
                     {
