@@ -88,6 +88,7 @@ namespace CodeRoom.WebForms.Data
         {
             const string sql =
                 "SELECT (SELECT COUNT(1) FROM dbo.Users) AS Users, " +
+                "       (SELECT COUNT(1) FROM dbo.Users WHERE Role = N'Student') AS Students, " +
                 "       (SELECT COUNT(1) FROM dbo.Users WHERE Role <> N'Student') AS Administrators, " +
                 "       (SELECT COUNT(1) FROM dbo.Courses) AS Courses, " +
                 "       (SELECT COUNT(1) FROM dbo.Lessons) AS Lessons, " +
