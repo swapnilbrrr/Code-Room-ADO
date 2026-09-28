@@ -275,6 +275,7 @@ namespace CodeRoom.DataLayerTests
             }
 
             var second = DbSeeder.Seed();
+            Console.WriteLine("       Second seed repairs: users=" + second.UsersRepaired + ", lessons=" + second.LessonsRepaired);
             Check("Second seed run creates no rows", second.TotalRowsCreated == 0, second.TotalRowsCreated + " rows");
             Check("Second seed run repairs no rows", second.UsersRepaired == 0 && second.LessonsRepaired == 0);
 
