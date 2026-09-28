@@ -51,8 +51,14 @@ namespace CodeRoom.WebForms.Data
                 return false;
             }
 
-            var submitted = answer.Trim();
-            var expected = challenge.ExpectedAnswer.Trim();
+            var submitted = (answer ?? string.Empty).Trim()
+                .Replace(" ", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty);
+            var expected = (challenge.ExpectedAnswer ?? string.Empty).Trim()
+                .Replace(" ", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty);
 
             if (string.Equals(challenge.ValidationMode, DomainValues.ValidationMode.Contains,
                     StringComparison.OrdinalIgnoreCase))
