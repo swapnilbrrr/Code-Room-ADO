@@ -36,7 +36,7 @@ namespace CodeRoom.WebForms.Services
             using (var connection = DbConnectionFactory.Open())
             using (var transaction = connection.BeginTransaction())
             {
-                UserRepository.AddXp(connection, transaction, userId, Math.Max(0, xpOverride ?? GetXp(activityType)));
+                var currentXp = UserRepository.AddXp(connection, transaction, userId, Math.Max(0, xpOverride ?? GetXp(activityType)));
 
                 ActivityRepository.Insert(connection, transaction, new UserActivity
                 {
@@ -62,7 +62,7 @@ namespace CodeRoom.WebForms.Services
                     });
                 }
 
-                AwardEligibleAchievements(connection, transaction, userId, activityType);
+                AwardEligibleAchievements(connection, transaction, userId, activityType, currentXp);
                 transaction.Commit();
             }
 
@@ -93,13 +93,12 @@ namespace CodeRoom.WebForms.Services
                 }
 
                 var title = milestone + "-day learning streak";
-                if (notifications.Exists(userId, DomainValues.NotificationType.StreakMilestone, title, DateTime.UtcNow.AddDays(-1)))
+                if (notifications.Exists(userId, DomainValues.NotificationType.StreakMilestone, title, DateTime.MinValue))
                 {
                     continue;
                 }
 
-                var user = users.GetById(userId);
-                if (user == null || !user.EmailNotificationsEnabled)
+                if (users.GetById(userId) == null)
                 {
                     continue;
                 }
@@ -187,7 +186,8 @@ namespace CodeRoom.WebForms.Services
             SqlConnection connection,
             SqlTransaction transaction,
             int userId,
-            string activityType)
+            string activityType,
+            int currentXp)
         {
             switch (activityType)
             {
@@ -208,8 +208,7 @@ namespace CodeRoom.WebForms.Services
                     break;
             }
 
-            var user = users.GetById(userId);
-            if (user != null && user.Xp >= 500)
+            if (currentXp >= 500)
             {
                 AwardAchievement(connection, transaction, userId, "xp-500");
             }
