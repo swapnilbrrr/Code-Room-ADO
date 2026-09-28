@@ -36,36 +36,108 @@ namespace CodeRoom.WebForms.Services
             using (var connection = DbConnectionFactory.Open())
             using (var transaction = connection.BeginTransaction())
             {
-                var currentXp = UserRepository.AddXp(connection, transaction, userId, Math.Max(0, xpOverride ?? GetXp(activityType)));
-
-                ActivityRepository.Insert(connection, transaction, new UserActivity
-                {
-                    UserId = userId,
-                    ActivityType = activityType,
-                    Description = description,
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                if (user.EmailNotificationsEnabled &&
-                    !string.IsNullOrWhiteSpace(notificationTitle) &&
-                    !string.IsNullOrWhiteSpace(notificationMessage))
-                {
-                    notifications.Insert(connection, transaction, new Notification
-                    {
-                        UserId = userId,
-                        Type = notificationType,
-                        Title = notificationTitle,
-                        Message = notificationMessage,
-                        LinkUrl = linkUrl,
-                        CreatedAt = DateTime.UtcNow,
-                        IsRead = false
-                    });
-                }
+                var currentXp = RecordInsideTransaction(
+                    connection, transaction, user, activityType, description,
+                    notificationTitle, notificationMessage, linkUrl, notificationType, xpOverride);
 
                 AwardEligibleAchievements(connection, transaction, userId, activityType, currentXp);
                 transaction.Commit();
             }
+        }
 
+        public bool Enroll(int userId, int courseId, string courseTitle, string category, string lessonUrl)
+        {
+            var user = users.GetById(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("The learner account could not be found.");
+            }
+
+            using (var connection = DbConnectionFactory.Open())
+            using (var transaction = connection.BeginTransaction())
+            {
+                if (EnrollmentExists(connection, transaction, userId, courseId))
+                {
+                    transaction.Commit();
+                    return false;
+                }
+
+                EnrollmentRepository.Insert(connection, transaction, userId, courseId);
+
+                var currentXp = RecordInsideTransaction(
+                    connection, transaction, user,
+                    DomainValues.ActivityType.CourseEnrolled,
+                    "Enrolled in " + courseTitle,
+                    "Course enrolled",
+                    "You are now enrolled in " + courseTitle + ". Your learning journey starts here.",
+                    lessonUrl,
+                    DomainValues.NotificationType.CourseEnrollment,
+                    null);
+
+                var enrollmentCount = CountEnrollments(connection, transaction, userId);
+                if (enrollmentCount == 1)
+                {
+                    AwardAchievement(connection, transaction, userId, "first-course");
+                }
+
+                if (string.Equals(category, "Cloud", StringComparison.OrdinalIgnoreCase))
+                {
+                    AwardAchievement(connection, transaction, userId, "cloud-path");
+                }
+
+                if (currentXp >= 500)
+                {
+                    AwardAchievement(connection, transaction, userId, "xp-500");
+                }
+
+                transaction.Commit();
+            }
+
+            TryRecordStreakMilestone(userId);
+            return true;
+        }
+
+        private int RecordInsideTransaction(
+            SqlConnection connection,
+            SqlTransaction transaction,
+            User user,
+            string activityType,
+            string description,
+            string notificationTitle,
+            string notificationMessage,
+            string linkUrl,
+            string notificationType,
+            int? xpOverride)
+        {
+            var currentXp = UserRepository.AddXp(
+                connection, transaction, user.Id,
+                Math.Max(0, xpOverride ?? GetXp(activityType)));
+
+            ActivityRepository.Insert(connection, transaction, new UserActivity
+            {
+                UserId = user.Id,
+                ActivityType = activityType,
+                Description = description,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            if (user.EmailNotificationsEnabled &&
+                !string.IsNullOrWhiteSpace(notificationTitle) &&
+                !string.IsNullOrWhiteSpace(notificationMessage))
+            {
+                notifications.Insert(connection, transaction, new Notification
+                {
+                    UserId = user.Id,
+                    Type = notificationType,
+                    Title = notificationTitle,
+                    Message = notificationMessage,
+                    LinkUrl = linkUrl,
+                    CreatedAt = DateTime.UtcNow,
+                    IsRead = false
+                });
+            }
+
+            return currentXp;
         }
 
         public void AwardAchievement(int userId, string code)
@@ -179,6 +251,27 @@ namespace CodeRoom.WebForms.Services
             }
 
             return streak;
+        }
+
+        private static bool EnrollmentExists(SqlConnection connection, SqlTransaction transaction, int userId, int courseId)
+        {
+            const string sql = "SELECT COUNT(1) FROM dbo.Enrollments WHERE UserId = @UserId AND CourseId = @CourseId;";
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@UserId", userId);
+                SqlHelper.AddInt(command, "@CourseId", courseId);
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
+        }
+
+        private static int CountEnrollments(SqlConnection connection, SqlTransaction transaction, int userId)
+        {
+            const string sql = "SELECT COUNT(1) FROM dbo.Enrollments WHERE UserId = @UserId;";
+            using (var command = SqlHelper.Prepare(connection, transaction, sql))
+            {
+                SqlHelper.AddInt(command, "@UserId", userId);
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
         }
 
         private void AwardEligibleAchievements(
