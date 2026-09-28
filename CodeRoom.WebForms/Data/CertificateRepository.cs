@@ -44,6 +44,14 @@ namespace CodeRoom.WebForms.Data
                 new SqlParameter("@UserId", SqlDbType.Int) { Value = userId });
         }
 
+        public Certificate GetByAttemptId(int attemptId, int userId)
+        {
+            const string sql = "SELECT " + Columns + " FROM dbo.Certificates WHERE QuizAttemptId = @AttemptId AND UserId = @UserId;";
+            return SqlHelper.ReadFirst(sql, Map,
+                new SqlParameter("@AttemptId", SqlDbType.Int) { Value = attemptId },
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId });
+        }
+
         public Certificate GetByNumber(string certificateNumber)
         {
             const string sql = "SELECT " + Columns + " FROM dbo.Certificates WHERE CertificateNumber = @Number;";
