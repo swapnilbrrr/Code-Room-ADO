@@ -1,17 +1,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Index.aspx.cs" Inherits="CodeRoom.WebForms.Certificates.Index" MasterPageFile="~/Site.Master" %>
-
 <asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Certificates - Code-Room</asp:Content>
-
-<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>My certificates</h1>
-            <p class="page-intro">Certificates you have earned will appear here.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
-</asp:Content>
+<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server"><section class="page-shell"><div class="container">
+<div class="learning-page-heading"><div><span class="eyebrow">ACHIEVEMENTS</span><h1 class="page-title">Your certificates</h1><p class="page-intro">Credentials earned by passing Code-Room certification examinations.</p></div><span class="learning-count"><asp:Literal ID="CertificateCount" runat="server" /> earned</span></div>
+<asp:Panel ID="EmptyPanel" runat="server" CssClass="empty-state" Visible="false"><div class="empty-state-icon">🎓</div><h2>Your first certificate starts here.</h2><p>Explore a certification path, complete its learning content and pass the final examination.</p><a class="btn btn-primary" href='<%= ResolveUrl("~/Courses/Index.aspx") %>'>Explore certification paths</a></asp:Panel>
+<asp:Repeater ID="CertificatesRepeater" runat="server"><HeaderTemplate><div class="certificate-grid"></HeaderTemplate><ItemTemplate><a class="certificate-card" href='<%# ResolveUrl("~/Certificates/Details.aspx?id=" + Eval("Id")) %>'><span class="certificate-icon">🎓</span><div><span class="eyebrow"><%# Eval("Course.Category") %></span><h2><%# Eval("Title") %></h2><p><%# Eval("Course.Title") %></p><small>Issued <%# FormatDate(Eval("IssuedAt")) %></small></div><span class="certificate-arrow">→</span></a></ItemTemplate><FooterTemplate></div></FooterTemplate></asp:Repeater>
+</div></section></asp:Content>
