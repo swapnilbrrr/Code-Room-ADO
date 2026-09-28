@@ -64,6 +64,25 @@ namespace CodeRoom.WebForms.Data
             return Convert.ToInt32(SqlHelper.ExecuteScalar("SELECT COUNT(1) FROM dbo.AdminAuditLogs;"));
         }
 
+        public int CountAuditEntriesForUser(int userId)
+        {
+            const string sql = "SELECT COUNT(1) FROM dbo.AdminAuditLogs WHERE UserId = @UserId;";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(sql,
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId }));
+        }
+
+        public List<AdminAuditLog> GetRecentForUser(int userId, int take = 8)
+        {
+            const string sql =
+                "SELECT TOP (@Take) a.Id, a.UserId, a.[Action], a.EntityType, a.EntityName, a.Description, a.CreatedAt, " +
+                "u.FullName, u.Username FROM dbo.AdminAuditLogs AS a INNER JOIN dbo.Users AS u ON u.Id = a.UserId " +
+                "WHERE a.UserId = @UserId ORDER BY a.CreatedAt DESC;";
+
+            return SqlHelper.ReadList(sql, Map,
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId },
+                new SqlParameter("@Take", SqlDbType.Int) { Value = take });
+        }
+
         /// <summary>The counters the admin dashboard shows, collected in a single round trip.</summary>
         public DataTable GetDashboardCounts()
         {
