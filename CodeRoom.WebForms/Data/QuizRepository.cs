@@ -247,6 +247,11 @@ namespace CodeRoom.WebForms.Data
                 new SqlParameter("@QuestionId", SqlDbType.Int) { Value = questionId });
         }
 
+        public void DeleteQuestion(int questionId)
+        {
+            SqlHelper.WithTransaction((connection, transaction) => DeleteQuestion(connection, transaction, questionId));
+        }
+
         public void DeleteQuestion(SqlConnection connection, SqlTransaction transaction, int questionId)
         {
             const string sql = "DELETE FROM dbo.Questions WHERE Id = @QuestionId;";
