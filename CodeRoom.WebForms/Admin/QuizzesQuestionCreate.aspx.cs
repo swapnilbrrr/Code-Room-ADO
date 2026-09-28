@@ -13,7 +13,7 @@ namespace CodeRoom.WebForms.Admin
         protected HiddenField QuizId;
         protected TextBox QuestionText, OptionA, OptionB, OptionC, OptionD;
         protected DropDownList CorrectOption;
-        protected HtmlControls.HtmlAnchor CancelLink;
+        protected System.Web.UI.HtmlControls.HtmlAnchor CancelLink;
         protected Button SaveButton;
 
         protected void Page_Load(object sender, EventArgs e)
