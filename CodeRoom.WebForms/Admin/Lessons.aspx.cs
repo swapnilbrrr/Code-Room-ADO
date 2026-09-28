@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -46,7 +47,7 @@ namespace CodeRoom.WebForms.Admin
             var raw = CourseFilter.SelectedValue;
             var courseRepo = new CourseRepository();
             var lessonRepo = new LessonRepository();
-            var rows = new System.Collections.Generic.List<object>();
+            var rows = new List<object>();
 
             if (!int.TryParse(raw, out courseId) || courseId <= 0)
             {
