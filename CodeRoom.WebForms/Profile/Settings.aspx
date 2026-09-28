@@ -18,7 +18,7 @@
    </div>
   </section>
   <section class="settings-card settings-section-card" id="account"><div class="settings-card-heading"><div><h2>Account</h2><p>Your sign-in identity and profile visibility.</p></div></div><div class="form-grid">
-   <label>Email address<asp:TextBox ID="Email" runat="server" CssClass="input" TextMode="Email" autocomplete="email" /><asp:RequiredFieldValidator ID="EmailRequired" runat="server" ControlToValidate="Email" ErrorMessage="Email address is required." CssClass="field-error" Display="Dynamic" /><asp:CustomValidator ID="EmailValidator" runat="server" ControlToValidate="Email" OnServerValidate="ValidateEmail" ErrorMessage="Enter a valid email address." CssClass="field-error" Display="Dynamic" /></label>
+   <label>Email address<asp:TextBox ID="Email" runat="server" CssClass="input" TextMode="SingleLine" autocomplete="email" /><asp:RequiredFieldValidator ID="EmailRequired" runat="server" ControlToValidate="Email" ErrorMessage="Email address is required." CssClass="field-error" Display="Dynamic" /><asp:CustomValidator ID="EmailValidator" runat="server" ControlToValidate="Email" OnServerValidate="ValidateEmail" ErrorMessage="Enter a valid email address." CssClass="field-error" Display="Dynamic" /></label>
    <label>Profile visibility<asp:DropDownList ID="ProfileVisibility" runat="server" CssClass="input"><asp:ListItem Value="Public">Public</asp:ListItem><asp:ListItem Value="Members">Code-Room members</asp:ListItem></asp:DropDownList></label>
   </div></section>
   <section class="settings-card settings-section-card" id="security"><div class="settings-card-heading"><div><h2>Security</h2><p>Change your password without leaving the settings area.</p></div></div><div class="form-grid">
