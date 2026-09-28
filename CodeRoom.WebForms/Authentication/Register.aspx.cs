@@ -68,6 +68,8 @@ namespace CodeRoom.WebForms.Authentication
                 {
                     user.Id = users.Insert(connection, transaction, user);
 
+                    UserRepository.AddXp(connection, transaction, user.Id, 25);
+
                     ActivityRepository.Insert(connection, transaction, new UserActivity
                     {
                         UserId = user.Id,
