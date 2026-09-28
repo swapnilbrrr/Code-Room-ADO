@@ -12,6 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build Web Forms solution
         shell: pwsh
         run: msbuild CodeRoom.sln /m /p:Configuration=Debug /p:Platform="Any CPU"
