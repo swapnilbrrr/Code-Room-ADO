@@ -1,17 +1,9 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Results.aspx.cs" Inherits="CodeRoom.WebForms.Quizzes.Results" MasterPageFile="~/Site.Master" %>
-
-<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Quiz results - Code-Room</asp:Content>
-
-<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>Quiz result</h1>
-            <p class="page-intro">Your score and answer review will appear here.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
-</asp:Content>
+<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Assessment Results - Code-Room</asp:Content>
+<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server"><section class="page-shell"><div class="container result-shell">
+<asp:Panel ID="NotFoundPanel" runat="server" CssClass="empty-state" Visible="false"><h2>Assessment result not found.</h2><p>The requested result could not be found.</p></asp:Panel>
+<asp:Panel ID="ResultPanel" runat="server" Visible="false"><div class="content-panel result-card"><span class="eyebrow"><asp:Literal ID="StatusEyebrow" runat="server" /></span><h1><asp:Literal ID="ResultHeading" runat="server" /></h1><div class="score"><asp:Literal ID="Score" runat="server" /> / <asp:Literal ID="Total" runat="server" /></div><p>You scored <strong><asp:Literal ID="Percent" runat="server" />%</strong> on the <asp:Literal ID="QuizTitle" runat="server" />.</p>
+<div id="ResultStatus" runat="server" class="result-status"><strong><asp:Literal ID="PassMessage" runat="server" /></strong><span>Required score: <asp:Literal ID="PassingScore" runat="server" />%</span></div>
+<asp:Panel ID="CertificatePanel" runat="server" CssClass="certificate-earned-callout" Visible="false"><span>🎓</span><div><strong>Certificate unlocked</strong><p><asp:Literal ID="CertificateTitle" runat="server" /> · <asp:Literal ID="CertificateNumber" runat="server" /></p></div><a id="CertificateLink" runat="server" class="btn btn-primary">View certificate</a></asp:Panel>
+<div class="result-actions"><a id="CourseLink" runat="server" class="btn btn-secondary">Back to course</a><asp:Panel ID="CertificatesLinkPanel" runat="server" Visible="false"><a class="btn btn-secondary" href='<%= ResolveUrl("~/Certificates/Index.aspx") %>'>My certificates</a></asp:Panel><a class="btn btn-primary" href='<%= ResolveUrl("~/Dashboard/MyDashboard.aspx") %>'>Dashboard</a></div>
+</div></asp:Panel></div></section></asp:Content>
