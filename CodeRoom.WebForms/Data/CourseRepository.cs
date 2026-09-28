@@ -21,7 +21,14 @@ namespace CodeRoom.WebForms.Data
         public List<Course> GetPublished()
         {
             const string sql = "SELECT " + Columns + " FROM dbo.Courses WHERE IsPublished = 1 ORDER BY Title;";
-            return SqlHelper.ReadList(sql, Map);
+            var courses = SqlHelper.ReadList(sql, Map);
+
+            foreach (var course in courses)
+            {
+                course.Lessons = LessonRepository.GetByCourse(course.Id);
+            }
+
+            return courses;
         }
 
         public List<Course> GetAll()
@@ -56,7 +63,7 @@ namespace CodeRoom.WebForms.Data
                 return null;
             }
 
-            course.Modules = new CourseModuleRepository().GetByCourse(courseId);
+            course.Modules = new CourseModuleRepository().GetCourseOutline(courseId);
             course.Lessons = LessonRepository.GetByCourse(courseId);
             course.Challenges = ChallengeRepository.GetByCourse(courseId);
 
