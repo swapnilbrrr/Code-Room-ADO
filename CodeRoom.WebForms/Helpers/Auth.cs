@@ -6,6 +6,7 @@ using System.Web.UI;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Models;
 using CodeRoom.WebForms.Services;
+using AppRoles = CodeRoom.WebForms.Services.Roles;
 
 namespace CodeRoom.WebForms.Helpers
 {
@@ -108,15 +109,15 @@ namespace CodeRoom.WebForms.Helpers
             }
         }
 
-        public static bool IsAdmin { get { return IsInRole(Roles.Admin) || IsInRole(Roles.SuperAdmin); } }
-        public static bool IsSuperAdmin { get { return IsInRole(Roles.SuperAdmin); } }
+        public static bool IsAdmin { get { return IsInRole(AppRoles.Admin) || IsInRole(AppRoles.SuperAdmin); } }
+        public static bool IsSuperAdmin { get { return IsInRole(AppRoles.SuperAdmin); } }
 
         public static string RoleLabel
         {
             get
             {
                 if (IsSuperAdmin) return "Super Administrator";
-                return IsInRole(Roles.Admin) ? "Administrator" : "Student";
+                return IsInRole(AppRoles.Admin) ? "Administrator" : "Student";
             }
         }
 
@@ -231,7 +232,7 @@ namespace CodeRoom.WebForms.Helpers
                 loginUrl += "?returnUrl=" + HttpUtility.UrlEncode(returnUrl);
 
             page.Response.Redirect(loginUrl, false);
-            page.Context.ApplicationInstance.CompleteRequest();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
             return true;
         }
 
@@ -241,7 +242,7 @@ namespace CodeRoom.WebForms.Helpers
             if (IsAdmin) return false;
 
             page.Response.Redirect(page.ResolveUrl(DeniedPage), false);
-            page.Context.ApplicationInstance.CompleteRequest();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
             return true;
         }
 
@@ -251,7 +252,7 @@ namespace CodeRoom.WebForms.Helpers
             if (IsSuperAdmin) return false;
 
             page.Response.Redirect(page.ResolveUrl(DeniedPage), false);
-            page.Context.ApplicationInstance.CompleteRequest();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
             return true;
         }
 
