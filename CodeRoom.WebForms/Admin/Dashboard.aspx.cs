@@ -1,16 +1,13 @@
 using System;
-using System.Web.UI;
+using CodeRoom.WebForms.Helpers;
 
 namespace CodeRoom.WebForms.Admin
 {
-    /// <summary>
-    /// Phase 2 structure only: URL, master page and styling for the migrated area.
-    /// Content and access gating are added with the ADO.NET layer in a later phase.
-    /// </summary>
-    public partial class Dashboard : Page
+    public partial class Dashboard : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Auth.RequireAdmin(this)) return;
         }
     }
 }
