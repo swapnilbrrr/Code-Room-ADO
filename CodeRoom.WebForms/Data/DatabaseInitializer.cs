@@ -21,7 +21,7 @@ namespace CodeRoom.WebForms.Data
         private static bool initialized;
 
         private static readonly Regex BatchSeparator =
-            new Regex(@"^[ \t]*GO[ \t]*(--.*)?$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            new Regex(@"^[ \t]*GO[ \t]*(--.*)?\r?$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
         /// <summary>Virtual path of the SQL Server schema script shipped with the project.</summary>
         public const string SchemaScript = "~/Database/CodeRoom.sql";
