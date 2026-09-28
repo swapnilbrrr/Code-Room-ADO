@@ -30,13 +30,15 @@ jobs:
           sqllocaldb info MSSQLLocalDB
 
       - name: Run data-layer acceptance tests
+        id: data_tests
+        continue-on-error: true
         shell: pwsh
         env:
           CODEROOM_TEST_CONNECTION_STRING: 'Server=(LocalDB)\MSSQLLocalDB;Database=CodeRoomDb;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=True'
         run: |
           & .\\Tools\\DataLayerTests\\bin\\Debug\\DataLayerTests.exe *> test-output.txt
           Get-Content test-output.txt
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          exit $LASTEXITCODE
 
       - name: Upload acceptance output
         if: always()
@@ -44,3 +46,8 @@ jobs:
         with:
           name: data-layer-test-output
           path: test-output.txt
+
+      - name: Fail if acceptance tests failed
+        if: steps.data_tests.outcome == 'failure'
+        shell: pwsh
+        run: exit 1
