@@ -179,11 +179,11 @@ namespace CodeRoom.DataLayerTests
                 Console.WriteLine("       Non-primary indexes: " + indexes);
 
                 var cascades = Scalar(connection, null,
-                    "SELECT STRING_AGG(name, ', ') FROM sys.foreign_keys WHERE delete_action = 1;");
+                    "SELECT STRING_AGG(name, ', ') FROM sys.foreign_keys WHERE delete_referential_action = 1;");
                 Console.WriteLine("       ON DELETE CASCADE: " + cascades);
 
                 var restrict = Scalar(connection, null,
-                    "SELECT STRING_AGG(name, ', ') FROM sys.foreign_keys WHERE delete_action = 0;");
+                    "SELECT STRING_AGG(name, ', ') FROM sys.foreign_keys WHERE delete_referential_action = 0;");
                 Console.WriteLine("       NO ACTION (multiple cascade paths handled in code): " + restrict);
             }
         }
