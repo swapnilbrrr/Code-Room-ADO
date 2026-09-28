@@ -62,37 +62,13 @@ namespace CodeRoom.WebForms.Courses
 
                 if (!wasAlreadyEnrolled)
                 {
-                    var totalEnrollmentsBefore = enrollments.CountByUser(userId);
-
-                    using (var connection = DbConnectionFactory.Open())
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        EnrollmentRepository.Insert(connection, transaction, userId, CourseModel.Id);
-                        transaction.Commit();
-                    }
-
                     var lessonUrl = ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id);
-
-                    learningActivity.Record(
-                        userId,
-                        DomainValues.ActivityType.CourseEnrolled,
-                        "Enrolled in " + CourseModel.Title,
-                        "Course enrolled",
-                        "You are now enrolled in " + CourseModel.Title + ". Your learning journey starts here.",
-                        lessonUrl,
-                        DomainValues.NotificationType.CourseEnrollment);
-
-                    if (totalEnrollmentsBefore == 0)
-                    {
-                        learningActivity.AwardAchievement(userId, "first-course");
-                    }
-
-                    if (string.Equals(CourseModel.Category, "Cloud", StringComparison.OrdinalIgnoreCase))
-                    {
-                        learningActivity.AwardAchievement(userId, "cloud-path");
-                    }
-
-                    learningActivity.TryRecordStreakMilestone(userId);
+                    learningActivity.Enroll(
+                        Auth.CurrentUserId,
+                        CourseModel.Id,
+                        CourseModel.Title,
+                        CourseModel.Category,
+                        lessonUrl);
 
                     var totalEnrollments = enrollments.CountByUser(userId);
                     var firstCourse = totalEnrollments == 1;
@@ -103,7 +79,6 @@ namespace CodeRoom.WebForms.Courses
                             : "You're ready to start " + CourseModel.Title + ".",
                         firstCourse ? "🏆" : "✓");
                 }
-
                 Response.Redirect(ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id), false);
                 Context.ApplicationInstance.CompleteRequest();
             }
