@@ -58,18 +58,15 @@ namespace CodeRoom.WebForms.Courses
                 }
 
                 var userId = Auth.CurrentUserId;
-                var wasAlreadyEnrolled = enrollments.IsEnrolled(userId, CourseModel.Id);
+                var enrolledNow = learningActivity.Enroll(
+                    userId,
+                    CourseModel.Id,
+                    CourseModel.Title,
+                    CourseModel.Category,
+                    ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id));
 
-                if (!wasAlreadyEnrolled)
+                if (enrolledNow)
                 {
-                    var lessonUrl = ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id);
-                    learningActivity.Enroll(
-                        Auth.CurrentUserId,
-                        CourseModel.Id,
-                        CourseModel.Title,
-                        CourseModel.Category,
-                        lessonUrl);
-
                     var totalEnrollments = enrollments.CountByUser(userId);
                     var firstCourse = totalEnrollments == 1;
                     Toast.Set(
