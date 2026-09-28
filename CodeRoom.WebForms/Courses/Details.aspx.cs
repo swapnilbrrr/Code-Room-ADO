@@ -13,6 +13,7 @@ namespace CodeRoom.WebForms.Courses
         private readonly EnrollmentRepository enrollments = new EnrollmentRepository();
         private readonly QuizRepository quizzes = new QuizRepository();
         private readonly ResourceRepository resources = new ResourceRepository();
+        private readonly LearningActivityService learningActivity = new LearningActivityService();
 
         protected Course CourseModel { get; private set; }
         protected Quiz QuizModel { get; private set; }
@@ -62,31 +63,36 @@ namespace CodeRoom.WebForms.Courses
                 if (!wasAlreadyEnrolled)
                 {
                     var totalEnrollmentsBefore = enrollments.CountByUser(userId);
+
                     using (var connection = DbConnectionFactory.Open())
                     using (var transaction = connection.BeginTransaction())
                     {
                         EnrollmentRepository.Insert(connection, transaction, userId, CourseModel.Id);
-
-                        ActivityRepository.Insert(connection, transaction, new UserActivity
-                        {
-                            UserId = userId,
-                            ActivityType = "CourseEnrolled",
-                            Description = "Enrolled in " + CourseModel.Title,
-                            CreatedAt = DateTime.UtcNow
-                        });
-
-                        if (totalEnrollmentsBefore == 0)
-                        {
-                            new AchievementRepository().Award(connection, transaction, userId, "first-course");
-                        }
-
-                        if (string.Equals(CourseModel.Category, "Cloud", StringComparison.OrdinalIgnoreCase))
-                        {
-                            new AchievementRepository().Award(connection, transaction, userId, "cloud-path");
-                        }
-
                         transaction.Commit();
                     }
+
+                    var lessonUrl = ResolveUrl("~/Lessons/Index.aspx?id=" + CourseModel.Id);
+
+                    learningActivity.Record(
+                        userId,
+                        DomainValues.ActivityType.CourseEnrolled,
+                        "Enrolled in " + CourseModel.Title,
+                        "Course enrolled",
+                        "You are now enrolled in " + CourseModel.Title + ". Your learning journey starts here.",
+                        lessonUrl,
+                        DomainValues.NotificationType.CourseEnrollment);
+
+                    if (totalEnrollmentsBefore == 0)
+                    {
+                        learningActivity.AwardAchievement(userId, "first-course");
+                    }
+
+                    if (string.Equals(CourseModel.Category, "Cloud", StringComparison.OrdinalIgnoreCase))
+                    {
+                        learningActivity.AwardAchievement(userId, "cloud-path");
+                    }
+
+                    learningActivity.TryRecordStreakMilestone(userId);
 
                     var totalEnrollments = enrollments.CountByUser(userId);
                     var firstCourse = totalEnrollments == 1;
@@ -170,7 +176,7 @@ namespace CodeRoom.WebForms.Courses
         private void RedirectToLogin()
         {
             var rawId = Convert.ToString(Request.QueryString["id"]);
-            var returnUrl = "~/Courses/Details.aspx?id=" + Server.UrlEncode(rawId);
+            var returnUrl = ResolveUrl("~/Courses/Details.aspx?id=" + Server.UrlEncode(rawId));
             Response.Redirect(ResolveUrl("~/Authentication/Login.aspx?returnUrl=" + Server.UrlEncode(returnUrl)), false);
             Context.ApplicationInstance.CompleteRequest();
         }
