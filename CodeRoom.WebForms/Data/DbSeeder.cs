@@ -560,14 +560,22 @@ namespace CodeRoom.WebForms.Data
 
                 if (lesson.Order == 1 && string.IsNullOrWhiteSpace(lesson.VideoUrl))
                 {
-                    lesson.VideoUrl = LessonMediaCatalog.VideoFor(row.CourseTitle);
-                    changed = true;
+                    var videoUrl = LessonMediaCatalog.VideoFor(row.CourseTitle);
+                    if (!string.IsNullOrWhiteSpace(videoUrl))
+                    {
+                        lesson.VideoUrl = videoUrl;
+                        changed = true;
+                    }
                 }
 
                 if (lesson.Order == 1 && string.IsNullOrWhiteSpace(lesson.ResourceUrl))
                 {
-                    lesson.ResourceUrl = LessonMediaCatalog.ResourceFor(row.CourseTitle);
-                    changed = true;
+                    var resourceUrl = LessonMediaCatalog.ResourceFor(row.CourseTitle);
+                    if (!string.IsNullOrWhiteSpace(resourceUrl))
+                    {
+                        lesson.ResourceUrl = resourceUrl;
+                        changed = true;
+                    }
                 }
 
                 if (!changed)
