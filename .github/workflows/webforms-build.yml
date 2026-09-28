@@ -33,4 +33,4 @@ jobs:
         shell: pwsh
         env:
           CODEROOM_TEST_CONNECTION_STRING: 'Server=(LocalDB)\MSSQLLocalDB;Database=CodeRoomDb;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=True'
-        run: ./Tools/DataLayerTests/bin/Debug/DataLayerTests.exe
+        run: ./Tools/DataLayerTests/bin/DataLayerTests.exe
