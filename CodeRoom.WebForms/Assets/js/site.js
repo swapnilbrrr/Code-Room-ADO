@@ -5,7 +5,17 @@
     const mobileToggle = document.querySelector('[data-mobile-toggle]');
     const mobileMenu = document.querySelector('[data-mobile-menu]');
 
-    root.dataset.theme = localStorage.getItem('code-room-theme') || 'light';
+    const themePreference = localStorage.getItem('code-room-theme') || 'system';
+    const systemDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const resolveTheme = preference => preference === 'system' ? (systemDark() ? 'dark' : 'light') : preference;
+
+    const applyTheme = preference => {
+        const resolved = resolveTheme(preference);
+        root.dataset.themePreference = preference;
+        root.dataset.theme = resolved;
+        localStorage.setItem('code-room-theme', preference);
+        updateThemeButton();
+    };
 
     const updateThemeButton = () => {
         if (!themeToggle) return;
@@ -15,12 +25,15 @@
         themeToggle.setAttribute('title', dark ? 'Switch to light mode' : 'Switch to dark mode');
     };
 
-    updateThemeButton();
+    applyTheme(themePreference);
 
     themeToggle?.addEventListener('click', () => {
-        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('code-room-theme', root.dataset.theme);
-        updateThemeButton();
+        applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    const colorScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    colorScheme?.addEventListener?.('change', () => {
+        if (root.dataset.themePreference === 'system') applyTheme('system');
     });
 
     let lastScrollY = window.scrollY;
