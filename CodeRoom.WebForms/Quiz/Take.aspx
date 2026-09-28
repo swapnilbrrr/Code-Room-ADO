@@ -1,17 +1,15 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Take.aspx.cs" Inherits="CodeRoom.WebForms.Quizzes.Take" MasterPageFile="~/Site.Master" %>
-
-<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Quiz - Code-Room</asp:Content>
-
+<asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server"><asp:Literal ID="PageTitle" runat="server" /></asp:Content>
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>Quiz</h1>
-            <p class="page-intro">The quiz questions will appear here once the data layer is migrated.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
+<section class="page-shell quiz-page"><div class="container quiz-shell">
+<asp:Panel ID="QuizContent" runat="server">
+<div class="quiz-header-card"><div><span class="eyebrow"><asp:Literal ID="AssessmentEyebrow" runat="server" /></span><h1 class="page-title"><asp:Literal ID="QuizTitle" runat="server" /></h1><p class="page-intro"><asp:Literal ID="QuizDescription" runat="server" /></p></div><div class="quiz-meta"><span><asp:Literal ID="QuestionCount" runat="server" /> questions</span><span>Pass: <asp:Literal ID="PassingScore" runat="server" />%</span><asp:Panel ID="TimerPanel" runat="server"><strong id="QuizTimer" data-quiz-timer>⏱ <asp:Literal ID="TimeLimit" runat="server" /></strong></asp:Panel></div></div>
+<div class="quiz-info-strip"><span>Read each scenario carefully.</span><span><asp:Literal ID="TimeInfo" runat="server" /></span><span>Answers are saved when you submit.</span></div>
+<div class="content-panel"><asp:HiddenField ID="QuizId" runat="server" /><asp:Repeater ID="QuestionsRepeater" runat="server"><ItemTemplate><fieldset class="quiz-question"><legend>Question <%# Container.ItemIndex + 1 %></legend><h2><%# Server.HtmlEncode(Eval("QuestionText").ToString()) %></h2><label class="option"><input type="radio" name='<%# "answer_" + Eval("Id") %>' value="A" /> <span><%# Server.HtmlEncode(Eval("OptionA").ToString()) %></span></label><label class="option"><input type="radio" name='<%# "answer_" + Eval("Id") %>' value="B" /> <span><%# Server.HtmlEncode(Eval("OptionB").ToString()) %></span></label><label class="option"><input type="radio" name='<%# "answer_" + Eval("Id") %>' value="C" /> <span><%# Server.HtmlEncode(Eval("OptionC").ToString()) %></span></label><label class="option"><input type="radio" name='<%# "answer_" + Eval("Id") %>' value="D" /> <span><%# Server.HtmlEncode(Eval("OptionD").ToString()) %></span></label></fieldset></ItemTemplate></asp:Repeater>
+<div class="quiz-submit-row"><span class="profile-muted"><asp:Literal ID="SubmitHint" runat="server" /></span><asp:Button ID="SubmitButton" runat="server" CssClass="btn btn-primary" Text="Submit answers" OnClick="SubmitButton_Click" /></div></div>
+</asp:Panel><asp:Panel ID="NotFound" runat="server" CssClass="content-panel" Visible="false"><span class="eyebrow">ASSESSMENT UNAVAILABLE</span><h1>Quiz not found.</h1><p class="page-intro">The requested assessment could not be found or does not contain any questions.</p></asp:Panel>
+</div></section>
 </asp:Content>
+<asp:Content ID="cScripts" ContentPlaceHolderID="ScriptsContent" runat="server"><script>
+(() => { const timer=document.querySelector('[data-quiz-timer]'); const form=document.querySelector('form'); if(!timer||!form)return; let remaining=Number(timer.textContent.replace(/[^0-9]/g,''))*60; if(!remaining)return; const render=()=>{const min=Math.floor(remaining/60),sec=remaining%60;timer.textContent='⏱ '+min+':'+String(sec).padStart(2,'0');if(remaining<=60)timer.classList.add('is-warning');};render();const handle=window.setInterval(()=>{remaining-=1;render();if(remaining<=0){window.clearInterval(handle);form.submit();}},1000);})();
+</script></asp:Content>
