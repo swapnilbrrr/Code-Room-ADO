@@ -84,6 +84,7 @@ namespace CodeRoom.WebForms.Services
             public const string CourseCompleted = "CourseCompleted";
             public const string ExamPassed = "ExamPassed";
             public const string QuizCompleted = "QuizCompleted";
+            public const string Challenge = "Challenge";
         }
 
         /// <summary>UserActivity.ActivityType values written by the source application.</summary>
