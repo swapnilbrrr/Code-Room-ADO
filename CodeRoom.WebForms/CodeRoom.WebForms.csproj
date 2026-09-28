@@ -272,6 +272,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserAchievement.cs" />
     <Compile Include="Models\UserActivity.cs" />
+    <Compile Include="Services\AdminAuditService.cs" />
     <Compile Include="Services\DomainValues.cs" />
     <Compile Include="Services\LearningActivityService.cs" />
     <Compile Include="Services\LessonContentBuilder.cs" />
