@@ -6,7 +6,6 @@
  <div class="settings-content">
   <div class="settings-heading"><div><span class="eyebrow">SETTINGS</span><h1 class="page-title">Account settings</h1><p class="page-intro">Control your Code-Room identity, security and learning experience.</p></div><a class="btn btn-secondary" href='<%= ResolveUrl("~/Profile/Index.aspx") %>'>View profile</a></div>
   <asp:ValidationSummary ID="ValidationSummary" runat="server" CssClass="validation-summary" />
-  <asp:HiddenField ID="CsrfToken" runat="server" />
   <section class="settings-card settings-section-card" id="profile"><div class="settings-card-heading"><div><h2>Profile</h2><p>These details are shown on your learning identity.</p></div></div>
    <div class="settings-profile-preview"><div class="profile-avatar profile-avatar-large"><asp:Literal ID="PreviewInitial" runat="server" /></div><div><strong><asp:Literal ID="PreviewName" runat="server" /></strong><span>@<asp:Literal ID="PreviewUsername" runat="server" /></span></div></div>
    <div class="form-grid">
