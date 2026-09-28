@@ -308,7 +308,7 @@ namespace CodeRoom.DataLayerTests
                 Check("Course aggregate loads modules and module lessons: " + course.Title,
                     detail != null
                     && detail.Modules != null
-                    && detail.Modules.All(m => m.Lessons != null),
+                    && detail.Modules.All(m => m.Lessons != null && m.Lessons.Count > 0),
                     detail == null ? "course not found" : detail.Modules.Count + " modules");
 
                 Check("Course has database-backed resources: " + course.Title,
