@@ -1,6 +1,7 @@
 using System;
 using CodeRoom.WebForms.Data;
 using CodeRoom.WebForms.Helpers;
+using CodeRoom.WebForms.Services;
 
 namespace CodeRoom.WebForms.Authentication
 {
