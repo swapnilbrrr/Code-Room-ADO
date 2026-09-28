@@ -327,6 +327,18 @@ namespace CodeRoom.WebForms.Data
             {
                 var courseId = FindCourseId(connection, transaction, seed.Slug);
 
+                // Networking Fundamentals is upgraded later to the permanent CCNA-style slug.
+                // If that upgraded row already exists, do not recreate the legacy course on the
+                // next seed run; otherwise the seed would drift by adding a second course each time.
+                if (courseId == 0 && seed.Slug == PlatformSeed.UpgradedNetworkingSlug)
+                {
+                    courseId = FindCourseId(connection, transaction, PlatformSeed.UpgradedNetworkingNewSlug);
+                    if (courseId != 0)
+                    {
+                        continue;
+                    }
+                }
+
                 if (courseId == 0)
                 {
                     courseId = CourseRepo.Insert(connection, transaction, ToCourse(seed));
