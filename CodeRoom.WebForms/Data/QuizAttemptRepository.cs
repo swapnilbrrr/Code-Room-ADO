@@ -74,6 +74,19 @@ namespace CodeRoom.WebForms.Data
                 new SqlParameter("@QuizId", SqlDbType.Int) { Value = quizId });
         }
 
+        public int GetAveragePercentForUser(int userId)
+        {
+            const string sql =
+                "SELECT AVG(CASE WHEN TotalQuestions = 0 THEN 0.0 " +
+                "ELSE (Score * 100.0 / TotalQuestions) END) " +
+                "FROM dbo.QuizAttempts WHERE UserId = @UserId;";
+
+            var value = SqlHelper.ExecuteScalar(sql,
+                new SqlParameter("@UserId", SqlDbType.Int) { Value = userId });
+
+            return value == null || value == SqlHelper.Null ? 0 : Convert.ToInt32(Math.Round(Convert.ToDouble(value)));
+        }
+
         public int CountByUser(int userId)
         {
             const string sql = "SELECT COUNT(1) FROM dbo.QuizAttempts WHERE UserId = @UserId;";
