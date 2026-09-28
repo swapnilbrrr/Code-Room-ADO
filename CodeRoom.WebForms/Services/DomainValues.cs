@@ -75,6 +75,7 @@ namespace CodeRoom.WebForms.Services
         public static class NotificationType
         {
             public const string Announcement = "Announcement";
+            public const string CourseEnrollment = "CourseEnrollment";
             public const string Activity = "Activity";
             public const string StreakMilestone = "StreakMilestone";
             public const string Achievement = "Achievement";
