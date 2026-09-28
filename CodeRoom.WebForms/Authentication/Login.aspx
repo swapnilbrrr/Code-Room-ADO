@@ -37,7 +37,7 @@
                         Display="Dynamic" />
                 </label>
 
-                <div class="form-field form-field-wide">
+                <div class="checkbox-row">
                     <asp:CheckBox ID="RememberMe" runat="server" Text="Remember me" />
                 </div>
             </div>
