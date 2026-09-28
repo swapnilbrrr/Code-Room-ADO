@@ -15,7 +15,7 @@ namespace CodeRoom.WebForms.Quizzes
         private readonly QuizRepository quizzes = new QuizRepository();
         protected void Page_Load(object sender, EventArgs e)
         {
-            Auth.RequireLogin(this);
+            if (Auth.RequireLogin(this)) return;
             if (!IsPostBack) LoadQuiz();
         }
         private void LoadQuiz()
@@ -42,7 +42,7 @@ namespace CodeRoom.WebForms.Quizzes
             Auth.RequireLogin(this); ((SiteMaster)Master).ValidateCsrf();
             int quizId; if(!int.TryParse(QuizId.Value,out quizId)){ShowNotFound();return;}
             var quiz=quizzes.GetForTaking(quizId); if(quiz==null||quiz.Questions.Count==0){ShowNotFound();return;}
-            if(!Auth.IsAdmin && !new EnrollmentRepository().Exists(Auth.CurrentUserId,quiz.CourseId)){Toast.Error("Enrollment required","Enroll in this course before taking the assessment.");Response.Redirect("~/Courses/Details.aspx?id="+quiz.CourseId,false);Context.ApplicationInstance.CompleteRequest();return;}
+            if(!Auth.IsAdmin && !new EnrollmentRepository().IsEnrolled(Auth.CurrentUserId,quiz.CourseId)){Toast.Error("Enrollment required","Enroll in this course before taking the assessment.");Response.Redirect("~/Courses/Details.aspx?id="+quiz.CourseId,false);Context.ApplicationInstance.CompleteRequest();return;}
             var answers=new Dictionary<int,string>();
             foreach(var question in quiz.Questions){var value=Request.Form["answer_"+question.Id];if(!string.IsNullOrWhiteSpace(value))answers[question.Id]=value.Trim().ToUpperInvariant();}
             if(answers.Count!=quiz.Questions.Count){Toast.Error("Incomplete assessment","Please answer every question before submitting.");LoadQuiz();return;}
