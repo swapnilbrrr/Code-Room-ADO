@@ -1,17 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Details.aspx.cs" Inherits="CodeRoom.WebForms.Certificates.Details" MasterPageFile="~/Site.Master" %>
-
 <asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Certificate - Code-Room</asp:Content>
-
-<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
-    <section class="page-shell">
-        <div class="container narrow-page">
-            <span class="eyebrow">CODE-ROOM</span>
-            <h1>Certificate</h1>
-            <p class="page-intro">The certificate detail view will appear here.</p>
-            <div class="content-panel">
-                <h2>Placeholder</h2>
-                <p>The page structure and shared styling for this area are in place. Its data-backed behaviour is migrated in a later phase, so no content is shown here yet.</p>
-            </div>
-        </div>
-    </section>
-</asp:Content>
+<asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server"><section class="page-shell"><div class="container certificate-page">
+<asp:Panel ID="NotFoundPanel" runat="server" CssClass="empty-state" Visible="false"><div class="empty-state-icon">🎓</div><h2>Certificate not found.</h2><p>The requested credential could not be found.</p></asp:Panel>
+<asp:Panel ID="CertificatePanel" runat="server" Visible="false"><article class="certificate-frame"><div class="certificate-mark">CODE-ROOM</div><span class="eyebrow">CERTIFICATE OF COMPLETION</span><h1><asp:Literal ID="CertificateTitle" runat="server" /></h1><p class="certificate-label">This credential is awarded to</p><h2><asp:Literal ID="RecipientName" runat="server" /></h2><p class="certificate-copy">for successfully completing <strong><asp:Literal ID="CourseTitle" runat="server" /></strong> and passing the required certification assessment.</p><div class="certificate-meta"><span><small>Certificate ID</small><strong><asp:Literal ID="CertificateNumber" runat="server" /></strong></span><span><small>Issued</small><strong><asp:Literal ID="IssuedDate" runat="server" /></strong></span></div><div class="certificate-actions"><a class="btn btn-secondary" href='<%= ResolveUrl("~/Certificates/Index.aspx") %>'>Back to certificates</a><a class="btn btn-secondary" href='<%= ResolveUrl("~/Certificates/Verify.aspx?number=") %><%= Server.UrlEncode(CertificateNumber.Text) %>'>Verify ID</a><button class="btn btn-primary" type="button" onclick="window.print()">Print certificate</button></div></article></asp:Panel>
+</div></section></asp:Content>
