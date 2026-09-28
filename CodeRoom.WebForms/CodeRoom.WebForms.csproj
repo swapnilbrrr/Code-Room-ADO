@@ -69,6 +69,10 @@
       <DependentUpon>Authentication\Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Authentication\Logout.aspx.designer.cs">
+      <DependentUpon>Authentication\Logout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Authentication\Logout.aspx.cs">
       <DependentUpon>Authentication\Logout.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
