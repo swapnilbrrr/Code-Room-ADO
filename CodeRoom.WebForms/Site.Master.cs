@@ -20,6 +20,13 @@ namespace CodeRoom.WebForms
             get { return ConfigurationManager.AppSettings["AssetVersion"] ?? "1"; }
         }
 
+        protected void LogoutButton_Click(object sender, EventArgs e)
+        {
+            Auth.SignOut();
+            Response.Redirect(ResolveUrl("~/Default.aspx"), false);
+            Context.ApplicationInstance.CompleteRequest();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             Auth.EnsureSessionIdentity();
