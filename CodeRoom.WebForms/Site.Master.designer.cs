@@ -24,6 +24,7 @@ namespace CodeRoom.WebForms
         protected global::System.Web.UI.WebControls.PlaceHolder PhFooterAuth;
         protected global::System.Web.UI.WebControls.PlaceHolder PhFooterAnonymous;
         protected global::System.Web.UI.WebControls.PlaceHolder PhCertificates;
+        protected global::System.Web.UI.WebControls.HiddenField MasterCsrfToken;
         protected global::System.Web.UI.WebControls.LinkButton LogoutButton;
         protected global::System.Web.UI.WebControls.LinkButton FooterLogoutButton;
         protected global::System.Web.UI.WebControls.PlaceHolder PhAdminConsole;
