@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using CodeRoom.WebForms.Data;
@@ -54,7 +55,7 @@ namespace CodeRoom.WebForms.Services
             }
 
             using (var connection = DbConnectionFactory.Open())
-            using (var transaction = connection.BeginTransaction())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
             {
                 if (EnrollmentExists(connection, transaction, userId, courseId))
                 {
