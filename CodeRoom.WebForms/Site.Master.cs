@@ -20,11 +20,16 @@ namespace CodeRoom.WebForms
             get { return ConfigurationManager.AppSettings["AssetVersion"] ?? "1"; }
         }
 
+        public void ValidateCsrf()
+        {
+            Csrf.Validate(MasterCsrfToken);
+        }
+
         protected void LogoutButton_Click(object sender, EventArgs e)
         {
             try
             {
-                Csrf.Validate(MasterCsrfToken);
+                ValidateCsrf();
             }
             catch (InvalidOperationException)
             {
