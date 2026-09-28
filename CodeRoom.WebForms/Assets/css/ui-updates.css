@@ -1326,12 +1326,67 @@
 .switch-row strong { color:var(--heading); font-size:.76rem; }
 .switch-row small { color:var(--muted); font-size:.64rem; line-height:1.45; }
 .switch-input { width:42px; height:22px; accent-color:var(--accent); }
-.segmented-control { display:flex; gap:6px; flex-wrap:wrap; }
-.segmented-control > span { display:inline-flex; }
-.segmented-control > span label { display:block; padding:8px 12px; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:.68rem; cursor:pointer; transition:background .18s ease, border-color .18s ease, color .18s ease; }
-.segmented-control input { position:absolute; opacity:0; pointer-events:none; }
-.segmented-control input:checked + label { border-color:var(--accent); background:var(--accent-soft); color:var(--heading); font-weight:700; }
-.segmented-control input:focus-visible + label { outline:2px solid var(--accent); outline-offset:2px; }
+.theme-options {
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+}
+.theme-option {
+    min-height:76px;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:13px 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+    color:var(--text);
+    text-align:left;
+    font:inherit;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.theme-option:hover {
+    transform:translateY(-1px);
+    border-color:color-mix(in srgb, var(--accent) 45%, var(--border));
+    background:var(--surface-muted);
+}
+.theme-option:focus-visible {
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+}
+.theme-option.is-selected {
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.theme-option-icon {
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+    display:grid;
+    place-items:center;
+    border-radius:9px;
+    background:var(--surface-muted);
+    color:var(--accent);
+    font-size:1rem;
+}
+.theme-option > span:last-child {
+    display:grid;
+    gap:3px;
+}
+.theme-option strong {
+    color:var(--heading);
+    font-size:.78rem;
+}
+.theme-option small {
+    color:var(--muted);
+    font-size:.62rem;
+    line-height:1.35;
+}
+@media (max-width:600px) {
+    .theme-options { grid-template-columns:1fr; }
+}
 
 .quiz-header-card {
     padding:20px; border:1px solid var(--border); border-radius:15px; background:var(--surface);
