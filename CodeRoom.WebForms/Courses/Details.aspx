@@ -55,7 +55,7 @@
 
                         <asp:PlaceHolder runat="server" Visible='<%# !IsAuthenticated %>'>
                             <a class="btn btn-primary btn-full"
-                               href='<%# ResolveUrl("~/Authentication/Login.aspx?returnUrl=" + Server.UrlEncode("~/Lessons/Index.aspx?id=" + CourseModel.Id)) %>'>Log in to start</a>
+                               href='<%# LoginToStartUrl %>'>Log in to start</a>
                         </asp:PlaceHolder>
 
                         <asp:PlaceHolder runat="server" Visible='<%# QuizModel != null %>'>
