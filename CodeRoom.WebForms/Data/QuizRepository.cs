@@ -239,6 +239,14 @@ namespace CodeRoom.WebForms.Data
             }
         }
 
+        public Question GetQuestionById(int questionId)
+        {
+            const string sql = "SELECT Id, QuizId, QuestionText, OptionA, OptionB, OptionC, OptionD, CorrectOption " +
+                "FROM dbo.Questions WHERE Id = @QuestionId;";
+            return SqlHelper.ReadFirst(sql, MapQuestion,
+                new SqlParameter("@QuestionId", SqlDbType.Int) { Value = questionId });
+        }
+
         public void DeleteQuestion(SqlConnection connection, SqlTransaction transaction, int questionId)
         {
             const string sql = "DELETE FROM dbo.Questions WHERE Id = @QuestionId;";
