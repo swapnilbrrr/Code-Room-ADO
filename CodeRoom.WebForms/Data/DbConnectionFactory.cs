@@ -18,6 +18,12 @@ namespace CodeRoom.WebForms.Data
         {
             get
             {
+                var testOverride = Environment.GetEnvironmentVariable("CODEROOM_TEST_CONNECTION_STRING");
+                if (!string.IsNullOrWhiteSpace(testOverride))
+                {
+                    return testOverride;
+                }
+
                 var setting = ConfigurationManager.ConnectionStrings[DefaultConnectionName];
 
                 if (setting == null || string.IsNullOrWhiteSpace(setting.ConnectionString))
