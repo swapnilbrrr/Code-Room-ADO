@@ -34,6 +34,7 @@ namespace CodeRoom.DataLayerTests
             Section("2. Database and schema", InitializationAndSchema);
             Section("2b. Application database connection", ApplicationDatabaseConnection);
             Section("3. Seed data", Seeding);
+            Section("3b. Course aggregates", CourseAggregates);
             Section("4. Create, read, update, delete", Crud);
             Section("5. Unique constraints, foreign keys and cascade behaviour", ConstraintsAndForeignKeys);
             Section("6. Transactions", Transactions);
@@ -284,6 +285,34 @@ namespace CodeRoom.DataLayerTests
                 Check("Question count unchanged after re-seeding", Count(connection, "SELECT COUNT(1) FROM dbo.Questions;") == 100);
                 Check("Resource count unchanged after re-seeding",
                     Count(connection, "SELECT COUNT(1) FROM dbo.Resources;") == resourceCountBeforeReseed);
+            }
+        }
+
+        // ----------------------------------------------------------- 3b. course aggregates --
+
+        private static void CourseAggregates()
+        {
+            Heading("3b. Course aggregates");
+
+            var courses = new CourseRepository();
+            var resources = new ResourceRepository();
+            var published = courses.GetPublished();
+
+            Check("Published catalogue courses include their lessons",
+                published.Count > 0 && published.All(c => c.Lessons != null && c.Lessons.Count > 0),
+                published.Count + " published courses");
+
+            foreach (var course in published)
+            {
+                var detail = courses.GetDetails(course.Id);
+                Check("Course aggregate loads modules and module lessons: " + course.Title,
+                    detail != null
+                    && detail.Modules != null
+                    && detail.Modules.All(m => m.Lessons != null),
+                    detail == null ? "course not found" : detail.Modules.Count + " modules");
+
+                Check("Course has database-backed resources: " + course.Title,
+                    resources.GetByCourse(course.Id, 8).Count > 0);
             }
         }
 
