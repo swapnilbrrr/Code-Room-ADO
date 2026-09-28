@@ -1,7 +1,7 @@
 using System;
 using System.Web.UI;
 
-namespace CodeRoom.WebForms.Quiz
+namespace CodeRoom.WebForms.Quizzes
 {
     /// <summary>
     /// Phase 2 structure only: URL, master page and styling for the migrated area.

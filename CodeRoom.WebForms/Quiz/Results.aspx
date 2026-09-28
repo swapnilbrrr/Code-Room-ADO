@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Results.aspx.cs" Inherits="CodeRoom.WebForms.Quiz.Results" MasterPageFile="~/Site.Master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Results.aspx.cs" Inherits="CodeRoom.WebForms.Quizzes.Results" MasterPageFile="~/Site.Master" %>
 
 <asp:Content ID="cTitle" ContentPlaceHolderID="TitleContent" runat="server">Quiz results - Code-Room</asp:Content>
 
