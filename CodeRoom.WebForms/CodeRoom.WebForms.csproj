@@ -254,6 +254,7 @@
     </Compile>
     <Compile Include="Helpers\Auth.cs" />
     <Compile Include="Helpers\Csrf.cs" />
+    <Compile Include="Helpers\SafeUrl.cs" />
     <Compile Include="Models\Achievement.cs" />
     <Compile Include="Models\AdminAuditLog.cs" />
     <Compile Include="Models\Announcement.cs" />
